@@ -1,0 +1,21 @@
+
+<mat-icon class="large-icon" color="primary">error_outline</mat-icon>
+<h1 mat-dialog-title>{{title}}</h1>
+<div mat-dialog-content>
+  
+  <p>{{message}}</p>
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      <ol>
+      @for(err of errors;track err; let idx=$index;){
+        <li>{{err}}</li>
+      }
+      </ol>
+    </mat-card-content>
+  </mat-card>
+    
+
+</div>
+<div mat-dialog-actions>
+  <button mat-flat-button mat-dialog-close>Ok</button>
+</div>

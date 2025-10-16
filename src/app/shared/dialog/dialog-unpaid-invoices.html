@@ -1,0 +1,31 @@
+<mat-icon class="large-icon" color="primary">error_outline</mat-icon>
+<h2 mat-dialog-title>{{ title }}</h2>
+<div mat-dialog-content>
+  <p>{{ message }}</p>
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      <mat-list>
+        <!-- Mostrar la lista de facturas -->
+        @for (invoice of invoices; track $index) {
+          <mat-list-item style="height: 90px;">
+            <div class="invoice-container">
+              <!-- Factura N° -->
+              <div>
+                <strong>Factura N°:</strong> {{ invoice.number }}
+              </div>
+              <!-- Fechas relacionadas con la factura -->
+              <div class="invoice-dates">
+                <div><strong>Fecha Documento:</strong> {{ invoice.date_doc }}</div>
+                <div><strong>Fecha Expiración:</strong> {{ invoice.date_exp }}</div>
+              </div>
+            </div>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+        }
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="dialogRef.close()">Ok</button>
+</div>
