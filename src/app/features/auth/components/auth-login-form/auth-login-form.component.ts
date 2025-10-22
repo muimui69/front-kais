@@ -1,9 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DialogComponent } from '../../../../shared/dialog/dialog.component';
-import { LocalStorageService } from '../../../../shared/services/localstorage/localstorage.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'auth-login-form',
@@ -12,63 +12,58 @@ import { LocalStorageService } from '../../../../shared/services/localstorage/lo
   standalone: false
 })
 export class AuthLoginFormComponent {
-
   hide = signal(true);
-  clickEvent(event: MouseEvent) {
+  isLoading = signal(false);
+
+  private authService = inject(AuthService);
+  private formBuilder = inject(FormBuilder);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
+
+  public Dialog = new DialogComponent(this.dialog);
+
+  loginForm = this.formBuilder.group({
+    username: ['', [Validators.required, Validators.minLength(2)]],
+    password: ['', [Validators.required, Validators.minLength(6)]]
+  });
+
+  clickEvent(event: MouseEvent): void {
     this.hide.set(!this.hide());
     event.stopPropagation();
   }
 
-  // private authService = inject(AuthService)
-  private local = inject(LocalStorageService)
-  private formBuilder = inject(FormBuilder)
-  private router = inject(Router)
-  private dialog = inject(MatDialog)
-  public isLoading = false
-  public Dialog = new DialogComponent(this.dialog)
-  loginForm = this.formBuilder.group({
-    // username: ['', [Validators.required, Validators.minLength(2)], []],
-    // pass: ['', [Validators.required, Validators.minLength(2)], []],
-    username: [''],
-    pass: [''],
-  });
+  onLogin(): void {
+    if (this.loginForm.invalid) {
+      this.Dialog.openDialogError(
+        'Por favor completa todos los campos correctamente',
+        'Error de validación'
+      );
+      return;
+    }
 
-  onLogin() {
-    this.isLoading = true
-    const { username, pass } = this.loginForm.value
-    const user = username as string
-    const password = pass as string
-    // const loginForm: LoginInterface = {
-    //   usercode: user, password
-    // }
+    this.isLoading.set(true);
 
-    // console.log({ loginForm })
+    const { username, password } = this.loginForm.value;
 
-    this.router.navigateByUrl('/dashboard');
+    this.authService.loginPanel(username!, password!).subscribe({
+      next: (response) => {
+        console.log('Login exitoso:', response);
 
-    this.isLoading = false;
-
-
-    // this.authService.login(loginForm)
-    //   .subscribe({
-    //     next: (res) => {
-    //       console.log({ res })
-    //       this.local.setItem<LoginResponse>('user', res);
-    //       this.router.navigateByUrl('/dashboard');
-    //       this.isLoading = false;
-    //     },
-    //     error: (err) => {
-    //       console.log({ err })
-    //       if (err.error.mensaje) {
-    //         this.Dialog.openDialogError(`${err.error.mensaje}`, 'Inicio de Sesion')
-    //       } else {
-    //         this.Dialog.openDialogError(`Hubo un error al iniciar la sesion`, 'Inicio de Sesion')
-    //       }
-    //       this.isLoading = false
-    //     }
-    //   })
-
-
+        this.Dialog.openDialogSuccess(
+          `Bienvenido ${response.user.fullName}`,
+          'Inicio de sesión exitoso'
+        );
+        this.router.navigateByUrl('/dashboard');
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error en login:', err);
+        const errorMessage = err.error?.message
+          || 'Hubo un error al iniciar sesión. Por favor intenta nuevamente.';
+        this.Dialog.openDialogError(errorMessage, 'Error de inicio de sesión');
+        this.isLoading.set(false);
+      }
+    });
   }
 
 

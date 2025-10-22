@@ -10,11 +10,6 @@
     flex-direction: column;
 }
 
-/* Profile section border and icon tweaks */
-.custom-sidenav .border-b {
-    border-bottom: 1px solid #253053 !important;
-}
-
 .custom-sidenav .mat-icon {
     color: #a3aed4;
 }
@@ -23,7 +18,7 @@
 .custom-list-item {
     font-size: 1rem;
     transition: background 0.2s, color 0.2s;
-    border-radius: 0.75rem !important;
+    border-radius: 1rem !important;
     margin-bottom: 0.25rem;
     padding: 10px 16px;
     display: flex;
@@ -76,24 +71,4 @@
 .custom-expansion-panel .custom-list-item:hover .mat-icon,
 .custom-expansion-panel .custom-list-item.active-link .mat-icon {
     color: #005cbb !important;
-}
-
-/* Divider styling */
-.mat-divider {
-    background: #253053 !important;
-    height: 1px !important;
-}
-
-/* Logout item */
-.logout-item {
-    color: #36e7d2 !important;
-    border-radius: 0.75rem !important;
-}
-
-.logout-item:hover {
-    background: #232e4d !important;
-}
-
-.logout-item .mat-icon {
-    color: #36e7d2 !important;
 }

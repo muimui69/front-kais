@@ -14,7 +14,7 @@
     <mat-form-field appearance="fill" class="w-full mb-4">
       <mat-label>Contraseña</mat-label>
       <input matInput [type]="hide() ? 'password' : 'text'"
-        placeholder="Ex. Abc123" formControlName="pass">
+        placeholder="Ex. Abc123" formControlName="password">
       <button type="button" mat-icon-button matSuffix
         (click)="clickEvent($event)" [attr.aria-label]="'Hide password'"
         [attr.aria-pressed]="hide()">
@@ -24,11 +24,11 @@
     </mat-form-field>
 
     <button type="submit" class="w-full mt-2" mat-raised-button
-      [disabled]="loginForm.invalid || isLoading" color="primary">
+      [disabled]="loginForm.invalid || isLoading ()" color="primary">
       <mat-icon>login</mat-icon>Ingresar
     </button>
 
-    @if(isLoading){
+    @if(isLoading()){
     <div class="pt-5">
       <mat-spinner
         diameter="50"></mat-spinner>

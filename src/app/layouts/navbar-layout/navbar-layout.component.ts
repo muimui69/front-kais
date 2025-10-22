@@ -13,6 +13,7 @@ import { LocalStorageService } from '../../shared/services/localstorage/localsto
 import { MaterialModule } from '../../shared/material.module';
 import { menuItem } from '../../shared/menuItem/menuItem';
 import { Menu } from '../../shared/enums/menu-enum/menu-Enum';
+import { AuthService } from '../../features/auth/services/auth.service';
 // import { LoginResponse } from '../../../auth/interface/loginResponse.interface';
 // import { ThemeToggleComponent } from "../../../shared/services/theme/theme-toggle.component";
 @Component({
@@ -36,6 +37,7 @@ export class NavbarLayoutComponent {
   private _mobileQueryListener: () => void;
   // public user?: LoginResponse;
   private local = inject(LocalStorageService);
+  private authService = inject(AuthService);
   // public roles = Role;
   public menu = Menu;
 
@@ -93,12 +95,9 @@ export class NavbarLayoutComponent {
     this.mobileQuery.addListener(this._mobileQueryListener);
   }
 
-  onLogout() {
-    localStorage.removeItem('user')
-    this.router.navigateByUrl('/auth/login')
-    // this.local.removeItem('sucCode')
-    // this.local.removeItem('indexTabMisPedidos')
-    // this.local.removeItem('detalleFacturados')
+  onLogout(): void {
+    this.authService.logout();
+
   }
 
   isActive(route: string): boolean {

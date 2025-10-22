@@ -1,5 +1,4 @@
 <div class="h-screen flex flex-col">
-  <!-- Toolbar -->
   <mat-toolbar color="primary" class="flex justify-between items-center">
     <button mat-icon-button (click)="snav.toggle()">
       <mat-icon>menu</mat-icon>
@@ -12,33 +11,20 @@
       fixedTopGap="64"
       class="custom-sidenav"
       [ngClass]="{'dark-theme': isDarkTheme, 'light-theme': !isDarkTheme}">
-      <!-- Sidebar top panel: logo and profile -->
-      <div
-        class="flex flex-col items-center py-6 px-4 border-b border-[#253053]">
-        <!-- Logo and notifications -->
-        <div class="flex items-center w-full justify-between mb-4">
-          <img src="assets/logo.svg" alt="Logo" class="h-7">
-          <div class="flex gap-2">
-            <button mat-icon-button class="!text-[#36e7d2]">
-              <mat-icon>notifications</mat-icon>
-            </button>
-            <button mat-icon-button class="!text-[#a3aed4]">
-              <mat-icon>settings</mat-icon>
-            </button>
-          </div>
+      <!-- <div
+        class="flex flex-col items-center py-10 px-3">
+        <mat-icon
+          class="w-100 h-100 rounded-full">account_circle</mat-icon>
+        <div class="font-semibold text-white text-lg">Brian Hughes
         </div>
-        <img src="assets/avatar.jpg" alt="Avatar"
-          class="w-16 h-16 rounded-full mb-2 border-4 border-[#1a2251]">
-        <div class="font-semibold text-white text-lg">Brian Hughes</div>
-        <div class="text-[#a3aed4] text-xs">hughes.brian@company.com</div>
       </div>
+
+      <mat-divider></mat-divider>
+      <div class="border-4 border-black"></div> -->
 
       <!-- Menu items -->
       <div class="flex-1 overflow-y-auto px-2 pt-4">
         <!-- Example: Main section title -->
-        <div
-          class="uppercase text-xs text-[#36e7d2] font-bold mb-1 mt-2">DASHBOARDS</div>
-        <div class="text-xs text-[#8a94b8] mb-3">Unique dashboard designs</div>
         @for (nav of fillerNav; track nav) {
         @if (!nav.items || nav.items.length === 0) {
         <mat-list-item [routerLink]="nav.router"
@@ -54,7 +40,7 @@
           <mat-expansion-panel-header class="custom-expansion-header">
             <mat-panel-title>
               <mat-icon matListItemIcon>{{nav.icon}}</mat-icon>
-              <span class="ml-2">{{nav.name}}</span>
+              <span class="ml-2 text-white">{{nav.name}}</span>
             </mat-panel-title>
           </mat-expansion-panel-header>
           @for (item of nav.items; track item) {
@@ -69,18 +55,11 @@
         </mat-expansion-panel>
         }
         }
-        <!-- Example: Applications section -->
-        <div
-          class="uppercase text-xs text-[#36e7d2] font-bold mt-6 mb-1">APPLICATIONS</div>
-        <div class="text-xs text-[#8a94b8] mb-3">Custom made application
-          designs</div>
-        <!-- Aquí puedes renderizar más items u otra sección si lo deseas -->
       </div>
-      <!-- Log out button -->
       <div class="mt-auto mb-4 px-4">
-        <mat-divider class="bg-[#253053] mb-2"></mat-divider>
+        <div class="border-1 border-gray-600 mb-4"></div>
         <mat-list-item (click)="onLogout()"
-          class="rounded-lg px-3 py-2 text-[#36e7d2] hover:bg-[#232e4d] cursor-pointer logout-item">
+          class="rounded-lg px-3 py-2">
           <mat-icon matListItemIcon>logout</mat-icon>
           Cerrar Sesión
         </mat-list-item>

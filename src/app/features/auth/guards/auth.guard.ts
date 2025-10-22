@@ -1,21 +1,18 @@
-// import { inject, PLATFORM_ID, Inject } from '@angular/core';
-// import { CanActivateChildFn, Router } from '@angular/router';
-// // import { AuthService } from '../services/auth.service';
-// import { isPlatformBrowser } from '@angular/common';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
-// export const authGuard: CanActivateChildFn = (childRoute, state) => {
-//   // const authService = inject(AuthService);
-//   const router = inject(Router);
-//   const platformId = inject(PLATFORM_ID);
+export const authGuard: CanActivateFn = (route, state) => {
+    const authService = inject(AuthService);
+    const router = inject(Router);
 
-//   if (!isPlatformBrowser(platformId)) {
-//     return true;
-//   }
+    if (authService.isAuthenticated()) {
+        return true;
+    }
 
-//   // if (authService.isLogged()) {
-//   //   return true;
-//   // } else {
-//   //   router.navigateByUrl('/auth');
-//   //   return false;
-//   // }
-// };
+    router.navigate(['/auth'], {
+        queryParams: { returnUrl: state.url }
+    });
+
+    return false;
+};
