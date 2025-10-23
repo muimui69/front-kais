@@ -1,0 +1,72 @@
+<button
+  mat-icon-button
+  [matMenuTriggerFor]="userMenu"
+  class="relative"
+  aria-label="User menu">
+  <div
+    class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm shadow-md"
+    style="background-color: #725a1f; color: #f4d13f;">
+    {{ user()?.fullName ? user()!.fullName.charAt(0).toUpperCase() : 'U' }}
+  </div>
+</button>
+
+<mat-menu
+  #userMenu="matMenu"
+  xPosition="before"
+  [hasBackdrop]="false"
+  [overlapTrigger]="false">
+
+  <div class="px-4 py-4 border-b"
+    style="background-color: #242b35; border-color: #5c6c71;"
+    (click)="$event.stopPropagation()">
+    <div class="flex items-center gap-3">
+      <div
+        class="w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl shadow-lg flex-shrink-0"
+        style="background-color: #725a1f; color: #f4d13f;">
+        {{ user()?.fullName ? user()!.fullName.charAt(0).toUpperCase() : 'U' }}
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold truncate" style="color: #ffffff;">
+          {{ user()?.fullName || 'Usuario' }}!
+        </p>
+        <p class="text-xs truncate" style="color: #bec8cc;">
+          {{ user()?.email }}
+        </p>
+        @if (user()?.role) {
+        <span
+          class="inline-flex items-center px-2 py-1 rounded text-xs font-medium mt-1"
+          style="background-color: #725a1f; color: #f4d13f;">
+          {{ user()!.role!.name }}
+        </span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="py-2" style="background-color: #242b35;">
+    <button mat-menu-item (click)="goToProfile()" class="menu-item-custom">
+      <mat-icon style="color: #bec8cc;">person</mat-icon>
+      <span class="text-sm" style="color: #bec8cc;">Mi Perfil</span>
+    </button>
+
+    <button mat-menu-item (click)="goToSettings()" class="menu-item-custom">
+      <mat-icon style="color: #bec8cc;">settings</mat-icon>
+      <span class="text-sm" style="color: #bec8cc;">Configuración</span>
+    </button>
+
+    <button mat-menu-item (click)="goToNotifications()"
+      class="menu-item-custom">
+      <mat-icon style="color: #bec8cc;">notifications</mat-icon>
+      <span class="text-sm" style="color: #bec8cc;">Notificaciones</span>
+    </button>
+  </div>
+
+  <div class="py-2" style="background-color: #242b35;">
+    <button mat-menu-item (click)="logout()" class="menu-item-custom">
+      <mat-icon style="color: #f4d13f;">logout</mat-icon>
+      <span class="text-sm font-medium" style="color: #f4d13f;">Cerrar
+        Sesión</span>
+    </button>
+  </div>
+</mat-menu>

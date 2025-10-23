@@ -1,0 +1,154 @@
+.table-container {
+    width: 100%;
+    padding: 0;
+}
+
+.table-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #242b35;
+    margin-bottom: 1.5rem;
+}
+
+.search-container {
+    margin-bottom: 1rem;
+}
+
+.search-field {
+    width: 100%;
+    max-width: 400px;
+}
+
+.loading-bar {
+    height: 3px !important;
+    margin-bottom: 1rem;
+}
+
+.table-wrapper {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+}
+
+.table-header {
+    background-color: #f9fafb !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    padding: 16px !important;
+    border-bottom: 2px solid #e5e7eb !important;
+}
+
+.table-cell {
+    padding: 16px !important;
+    color: #1f2937;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.cell-text {
+    font-size: 0.875rem;
+}
+
+.checkbox-cell {
+    width: 60px !important;
+    text-align: center !important;
+    padding: 16px 8px !important;
+}
+
+.table-row {
+    transition: background-color 0.2s ease;
+}
+
+.table-row.clickable {
+    cursor: pointer;
+}
+
+.table-row:hover {
+    background-color: #f9fafb !important;
+}
+
+.status-chip {
+    height: 28px !important;
+    font-size: 0.813rem !important;
+    font-weight: 500 !important;
+    border-radius: 6px !important;
+    padding: 0 12px !important;
+}
+
+.table-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.actions-header {
+    background-color: #f9fafb !important;
+    width: 120px !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    padding: 16px !important;
+    border-bottom: 2px solid #e5e7eb !important;
+}
+
+.actions-cell {
+    width: 120px !important;
+    text-align: center !important;
+    padding: 8px !important;
+}
+
+.actions-button {
+    color: #5c6c71 !important;
+}
+
+.actions-inline {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-data-cell {
+    text-align: center;
+    padding: 3rem 1rem !important;
+    color: #6b7280;
+    font-size: 0.938rem;
+}
+
+.table-paginator {
+    border-top: 1px solid #e5e7eb !important;
+    background-color: #f9fafb !important;
+}
+
+::ng-deep .mat-mdc-paginator-container {
+    padding: 8px 16px !important;
+}
+
+::ng-deep .mat-mdc-progress-bar {
+    height: 3px !important;
+}
+
+@media (max-width: 768px) {
+    .table-title {
+        font-size: 1.25rem;
+    }
+
+    .search-field {
+        max-width: 100%;
+    }
+
+    .table-header,
+    .table-cell {
+        padding: 12px 8px !important;
+        font-size: 0.813rem;
+    }
+}

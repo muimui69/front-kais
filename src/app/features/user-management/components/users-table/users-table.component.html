@@ -1,0 +1,15 @@
+<div class="p-6">
+  <shared-generic-table
+    [data]="formattedUsers()"
+    [columns]="columns"
+    [actions]="actions"
+    [isLoading]="isLoading"
+    [showSelection]="false"
+    [actionsInMenu]="true"
+    [title]="'Gestión de Usuarios'"
+    [searchFields]="['name', 'email', 'role']"
+    [searchPlaceholder]="'Buscar usuario...'"
+    (rowClick)="onRowClick($event)"
+    (selectionChange)="onSelectionChange($event)">
+  </shared-generic-table>
+</div>

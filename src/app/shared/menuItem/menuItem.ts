@@ -12,25 +12,13 @@ export const menuItem = [
   {
     name: Menu.GESTION_USUARIOS,
     icon: 'group',
-    router: '',
+    router: 'users',
     items: [
       {
-        name: 'Profesionales',
+        name: 'Usuarios del sistema',
         icon: 'person',
-        router: '/gestion-usuarios/profesionales',
+        router: '/users/user-manegement',
         // role: [Role.ADMIN]
-      },
-      {
-        name: 'Solicitantes',
-        icon: 'people',
-        router: '/gestion-usuarios/solicitantes',
-        // role: [Role.ADMIN]
-      },
-      {
-        name: 'Administradores',
-        icon: 'admin_panel_settings',
-        router: '/gestion-usuarios/administradores',
-        // role: [Role.SUPER_ADMIN]
       },
     ]
   },

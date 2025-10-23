@@ -1,71 +1,87 @@
 <div class="h-screen flex flex-col">
-  <mat-toolbar color="primary" class="flex justify-between items-center">
-    <button mat-icon-button (click)="snav.toggle()">
-      <mat-icon>menu</mat-icon>
-    </button>
+  <!-- Toolbar con fondo blanco -->
+  <mat-toolbar color="primary" class="flex justify-between items-center px-4">
+    <div class="flex items-center gap-3">
+      <button mat-icon-button (click)="snav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <shared-user-avatar-menu />
+    </div>
   </mat-toolbar>
+
   <mat-sidenav-container class="flex-1 h-full">
-    <mat-sidenav #snav
+    <mat-sidenav
+      #snav
       [mode]="mobileQuery.matches ? 'over' : 'side'"
       [fixedInViewport]="mobileQuery.matches"
       fixedTopGap="64"
       class="custom-sidenav"
-      [ngClass]="{'dark-theme': isDarkTheme, 'light-theme': !isDarkTheme}">
-      <!-- <div
-        class="flex flex-col items-center py-10 px-3">
-        <mat-icon
-          class="w-100 h-100 rounded-full">account_circle</mat-icon>
-        <div class="font-semibold text-white text-lg">Brian Hughes
+      [opened]="!mobileQuery.matches">
+
+      <div class="px-5 py-6 border-b border-[#5c6c71] border-opacity-10">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 bg-[#f4d13f] rounded-lg flex items-center justify-center">
+            <mat-icon class="!text-[#242b35]">search</mat-icon>
+          </div>
+          <div>
+            <h2 class="text-base font-semibold text-white">TeBusco</h2>
+            <p class="text-xs text-gray-400">Descripcion de ejemplo</p>
+          </div>
         </div>
       </div>
 
-      <mat-divider></mat-divider>
-      <div class="border-4 border-black"></div> -->
-
-      <!-- Menu items -->
-      <div class="flex-1 overflow-y-auto px-2 pt-4">
-        <!-- Example: Main section title -->
+      <!-- Menu items SIN clases de padding -->
+      <div class="flex-1 overflow-y-auto">
         @for (nav of fillerNav; track nav) {
         @if (!nav.items || nav.items.length === 0) {
-        <mat-list-item [routerLink]="nav.router"
-          (click)="snav.toggle()"
+        <!-- Item simple -->
+        <mat-list-item
+          [routerLink]="nav.router"
+          (click)="mobileQuery.matches && snav.toggle()"
           class="custom-list-item"
           [ngClass]="{'active-link': isActive(nav.router)}">
           <mat-icon matListItemIcon>{{nav.icon}}</mat-icon>
-          {{nav.name}}
+          <span matListItemTitle>{{nav.name}}</span>
         </mat-list-item>
         }
+
         @if (nav.items && nav.items.length > 0) {
+        <!-- Item con submenú -->
         <mat-expansion-panel class="custom-expansion-panel">
-          <mat-expansion-panel-header class="custom-expansion-header">
+          <mat-expansion-panel-header>
             <mat-panel-title>
-              <mat-icon matListItemIcon>{{nav.icon}}</mat-icon>
-              <span class="ml-2 text-white">{{nav.name}}</span>
+              <mat-icon>{{nav.icon}}</mat-icon>
+              <span>{{nav.name}}</span>
             </mat-panel-title>
+            @if (nav.items.length > 0) {
+            <!-- <span
+              class="ml-auto bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
+              {{nav.items.length}}
+            </span> -->
+            }
           </mat-expansion-panel-header>
+
           @for (item of nav.items; track item) {
-          <mat-list-item [routerLink]="item.router"
-            (click)="snav.toggle()"
+          <mat-list-item
+            [routerLink]="item.router"
+            (click)="mobileQuery.matches && snav.toggle()"
             class="custom-list-item"
             [ngClass]="{'active-link': isActive(item.router)}">
             <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
-            {{item.name}}
+            <span matListItemTitle>{{item.name}}</span>
           </mat-list-item>
           }
         </mat-expansion-panel>
         }
         }
       </div>
-      <div class="mt-auto mb-4 px-4">
-        <div class="border-1 border-gray-600 mb-4"></div>
-        <mat-list-item (click)="onLogout()"
-          class="rounded-lg px-3 py-2">
-          <mat-icon matListItemIcon>logout</mat-icon>
-          Cerrar Sesión
-        </mat-list-item>
-      </div>
     </mat-sidenav>
-    <mat-sidenav-content class="p-4">
+
+    <mat-sidenav-content class="p-6 bg-gray-50">
       <router-outlet></router-outlet>
     </mat-sidenav-content>
   </mat-sidenav-container>

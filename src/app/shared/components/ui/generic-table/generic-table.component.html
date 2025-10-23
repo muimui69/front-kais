@@ -1,0 +1,169 @@
+<div class="table-container">
+  @if (title) {
+  <h2 class="table-title">{{ title }}</h2>
+  }
+
+  @if (showSearch) {
+  <div class="search-container">
+    <mat-form-field appearance="fill" class="search-field">
+      <mat-label>{{ searchPlaceholder }}</mat-label>
+      <input
+        matInput
+        (keyup)="applyFilter($event)"
+        [placeholder]="searchPlaceholder">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+  }
+
+  @if (isLoading()) {
+  <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
+  }
+
+  @if (!isLoading()) {
+  <div class="table-wrapper">
+    <div class="table-responsive">
+      <table
+        mat-table
+        [dataSource]="paginatedData()"
+        matSort
+        (matSortChange)="onSortChange($event)"
+        class="data-table">
+
+        @if (showSelection) {
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef class="checkbox-cell">
+            <mat-checkbox
+              (change)="$event ? toggleAllRows() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row" class="checkbox-cell">
+            <mat-checkbox
+              (click)="$event.stopPropagation()"
+              (change)="$event ? toggleRow(row) : null"
+              [checked]="selection.isSelected(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+        }
+
+        @for (column of columns; track column.key) {
+        <ng-container [matColumnDef]="column.key">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            [mat-sort-header]="column.sortable !== false ? column.key : ''"
+            class="table-header"
+            [style.width]="column.width"
+            [style.text-align]="column.align || 'left'">
+            {{ column.header }}
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let row"
+            class="table-cell"
+            [style.text-align]="column.align || 'left'">
+
+            @if (!column.type || column.type === 'text' || column.type ===
+            'number') {
+            <span class="cell-text">
+              {{ getNestedValue(row, column.key) ?? '-' }}
+            </span>
+            }
+
+            @if (column.type === 'badge') {
+            <mat-chip
+              class="status-chip"
+              [style.background-color]="getBadgeColor(column, getNestedValue(row, column.key)).bg"
+              [style.color]="getBadgeColor(column, getNestedValue(row, column.key)).text">
+              {{ getNestedValue(row, column.key) }}
+            </mat-chip>
+            }
+
+            @if (column.type === 'boolean') {
+            <mat-icon
+              [style.color]="getNestedValue(row, column.key) ? '#10b981' : '#ef4444'">
+              {{ getNestedValue(row, column.key) ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+            }
+
+            @if (column.type === 'image') {
+            <img
+              [src]="getNestedValue(row, column.key)"
+              [alt]="column.header"
+              class="table-image">
+            }
+          </td>
+        </ng-container>
+        }
+
+        @if (actions.length > 0) {
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-header">
+            Acciones
+          </th>
+          <td mat-cell *matCellDef="let row" class="actions-cell">
+            @if (actionsInMenu) {
+            <button mat-icon-button [matMenuTriggerFor]="menu"
+              class="actions-button">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              @for (action of getVisibleActions(row); track action.icon) {
+              <button mat-menu-item (click)="action.action(row)">
+                <mat-icon [style.color]="action.color || '#5c6c71'">{{
+                  action.icon }}</mat-icon>
+                <span>{{ action.label }}</span>
+              </button>
+              }
+            </mat-menu>
+            } @else {
+            <div class="actions-inline">
+              @for (action of getVisibleActions(row); track action.icon) {
+              <button
+                mat-icon-button
+                [matTooltip]="action.tooltip || action.label"
+                [style.color]="action.color"
+                (click)="$event.stopPropagation(); action.action(row)">
+                <mat-icon>{{ action.icon }}</mat-icon>
+              </button>
+              }
+            </div>
+            }
+          </td>
+        </ng-container>
+        }
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns();"
+          class="table-row"
+          [class.clickable]="enableRowClick"
+          (click)="onRowClick(row)">
+        </tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="no-data-cell" [attr.colspan]="displayedColumns().length">
+            {{ noDataMessage }}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    @if (showPagination) {
+    <mat-paginator
+      [length]="totalItems()"
+      [pageSize]="currentPageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+      class="table-paginator">
+    </mat-paginator>
+    }
+  </div>
+  }
+</div>

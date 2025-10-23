@@ -14,6 +14,7 @@ import { MaterialModule } from '../../shared/material.module';
 import { menuItem } from '../../shared/menuItem/menuItem';
 import { Menu } from '../../shared/enums/menu-enum/menu-Enum';
 import { AuthService } from '../../features/auth/services/auth.service';
+import { UserAvatarMenuComponent } from "../../shared/components/user-avatar-menu/user-avatar-menu.component";
 // import { LoginResponse } from '../../../auth/interface/loginResponse.interface';
 // import { ThemeToggleComponent } from "../../../shared/services/theme/theme-toggle.component";
 @Component({
@@ -26,7 +27,7 @@ import { AuthService } from '../../features/auth/services/auth.service';
     CommonModule,
     RouterModule,
     MatSlideToggleModule,
-    // ThemeToggleComponent
+    UserAvatarMenuComponent
   ],
 })
 export class NavbarLayoutComponent {
@@ -101,7 +102,6 @@ export class NavbarLayoutComponent {
   }
 
   isActive(route: string): boolean {
-    // Para rutas exactas y también soporta rutas hijas activas
     return this.router.url === route || this.router.url.startsWith(route + '/');
   }
 

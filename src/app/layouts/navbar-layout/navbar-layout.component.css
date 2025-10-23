@@ -1,74 +1,187 @@
-/* Sidenav background for both themes */
 .custom-sidenav {
-    background-color: #005cbb !important;
+    background-color: #242b35 !important;
     color: white !important;
-    min-width: 18rem !important;
-    width: 18rem !important;
-    border-right: 1px solid #253053;
+    min-width: 16rem !important;
+    width: 16rem !important;
+    border-right: none !important;
     padding: 0 !important;
     display: flex;
     flex-direction: column;
 }
 
 .custom-sidenav .mat-icon {
-    color: #a3aed4;
+    color: #bec8cc !important;
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
-/* List item style */
+.custom-expansion-panel .mat-expansion-panel-header {
+    margin: 2px 2px !important;
+}
+
+.custom-expansion-panel .mat-expansion-panel-header span {
+    font-size: 0.95rem !important;
+    margin-left: 10px;
+    font-weight: 400 !important;
+    color: #bec8cc !important;
+}
+
 .custom-list-item {
-    font-size: 1rem;
-    transition: background 0.2s, color 0.2s;
-    border-radius: 1rem !important;
-    margin-bottom: 0.25rem;
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
+    font-size: 0.95rem !important;
+    font-weight: 400 !important;
+    transition: background 0.2s ease !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 14px 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    cursor: pointer !important;
+    color: #bec8cc !important;
+    background: transparent !important;
+    width: 100% !important;
+    min-height: 48px !important;
 }
 
-/* Active link and hover for menu items */
-.custom-list-item:hover,
+.custom-list-item .mdc-list-item__content {
+    color: #bec8cc !important;
+}
+
+.custom-list-item span {
+    color: #bec8cc !important;
+}
+
+.custom-list-item:hover {
+    background: #5c6c71 !important;
+    color: #ffffff !important;
+}
+
+.custom-list-item:hover .mat-icon {
+    color: #ffffff !important;
+}
+
 .custom-list-item.active-link {
-    background: #ffffff !important;
-    color: #005cbb !important;
+    background: #725a1f !important;
+    color: #ffffff !important;
+    border-left: 3px solid #f4d13f !important;
+    padding-left: 17px !important;
 }
 
-.custom-list-item:hover .mat-icon,
 .custom-list-item.active-link .mat-icon {
-    color: #005cbb !important;
+    color: #f4d13f !important;
 }
 
-/* Expansion panel header background and title color */
-.custom-expansion-header,
-.mat-expansion-panel-header {
-    background-color: #005cbb !important;
+.custom-expansion-panel {
+    background: transparent !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    width: 100% !important;
 }
 
-.custom-expansion-header .mat-panel-title,
-.mat-expansion-panel-header .mat-panel-title {
-    color: white !important;
+.custom-expansion-panel::before {
+    display: none !important;
 }
 
-/* Expansion panel style override for white submenu background */
+.custom-expansion-panel .mat-expansion-panel-header {
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 14px 20px !important;
+    height: auto !important;
+    min-height: 48px !important;
+    transition: background 0.2s ease !important;
+    margin: 0 !important;
+    width: 100% !important;
+}
+
+.custom-expansion-panel .mat-expansion-panel-header:hover {
+    background: #5c6c71 !important;
+}
+
+.custom-expansion-panel .mat-expansion-panel-header .mat-panel-title {
+    color: #bec8cc !important;
+    font-weight: 400 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.custom-expansion-panel .mat-expansion-panel-header .mat-panel-title span {
+    color: #bec8cc !important;
+}
+
+.custom-expansion-panel .mat-expansion-panel-header .mat-content {
+    color: #bec8cc !important;
+}
+
+.custom-expansion-panel .mat-expansion-indicator::after {
+    color: #bec8cc !important;
+}
+
 .custom-expansion-panel .mat-expansion-panel-body {
     padding: 0 !important;
-    background: transparent !important;
+    background: rgba(0, 0, 0, 0.25) !important;
+    margin: 0 !important;
 }
 
-/* Submenu list item (children) */
 .custom-expansion-panel .custom-list-item {
-    background: #fff !important;
-    color: #222 !important;
+    background: transparent !important;
+    color: #bec8cc !important;
+    /* padding: 12px 12px 12px 20px !important; */
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+    width: 100% !important;
     border-radius: 0 !important;
 }
 
-.custom-expansion-panel .custom-list-item:hover,
-.custom-expansion-panel .custom-list-item.active-link {
-    background: #e3f2fd !important;
-    color: #005cbb !important;
+.custom-expansion-panel .custom-list-item span {
+    color: #bec8cc !important;
 }
 
-.custom-expansion-panel .custom-list-item:hover .mat-icon,
+.custom-expansion-panel .custom-list-item:hover {
+    background: #5c6c71 !important;
+    color: #ffffff !important;
+}
+
+.custom-expansion-panel .custom-list-item.active-link {
+    background: #725a1f !important;
+    color: #ffffff !important;
+    border-left: 3px solid #f4d13f !important;
+    padding-left: 37px !important;
+}
+
 .custom-expansion-panel .custom-list-item.active-link .mat-icon {
-    color: #005cbb !important;
+    color: #f4d13f !important;
+}
+
+@media (max-width: 600px) {
+    .custom-sidenav {
+        min-width: 100% !important;
+        width: 100% !important;
+    }
+}
+
+/* ===================================
+   SCROLLBAR
+   =================================== */
+.custom-sidenav::-webkit-scrollbar {
+    width: 5px;
+}
+
+.custom-sidenav::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.custom-sidenav::-webkit-scrollbar-thumb {
+    background: #5c6c71 !important;
+    border-radius: 3px;
+}
+
+.custom-sidenav::-webkit-scrollbar-thumb:hover {
+    background: #bec8cc !important;
+}
+
+::ng-deep .custom-expansion-panel .mat-expansion-panel-header .mat-expansion-indicator svg {
+    fill: #bec8cc !important;
 }
