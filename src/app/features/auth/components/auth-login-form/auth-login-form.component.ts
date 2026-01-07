@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DialogComponent } from '../../../../shared/dialog/dialog.component';
 import { AuthService } from '../../services/auth.service';
+import { StorageService } from '../../../user-management/services/storage.service';
 
 @Component({
   selector: 'auth-login-form',
@@ -19,7 +20,7 @@ export class AuthLoginFormComponent {
   private formBuilder = inject(FormBuilder);
   private router = inject(Router);
   private dialog = inject(MatDialog);
-
+  private storageService = inject(StorageService);
   public Dialog = new DialogComponent(this.dialog);
 
   loginForm = this.formBuilder.group({
@@ -48,9 +49,11 @@ export class AuthLoginFormComponent {
     this.authService.loginPanel(username!, password!).subscribe({
       next: (response) => {
         console.log('Login exitoso:', response);
+        this.storageService.saveAdminToLocalStorage(response.data.admin);
+        const user = response.data.admin.user;
 
         this.Dialog.openDialogSuccess(
-          `Bienvenido ${response.user.fullName}`,
+          `Bienvenido ${user.name}`,
           'Inicio de sesión exitoso'
         );
         this.router.navigateByUrl('/dashboard');
@@ -60,11 +63,10 @@ export class AuthLoginFormComponent {
         console.error('Error en login:', err);
         const errorMessage = err.error?.message
           || 'Hubo un error al iniciar sesión. Por favor intenta nuevamente.';
+
         this.Dialog.openDialogError(errorMessage, 'Error de inicio de sesión');
         this.isLoading.set(false);
       }
     });
   }
-
-
 }

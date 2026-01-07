@@ -7,10 +7,12 @@ import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient, withFetch } fro
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from './shared/material.module';
 import { AuthInterceptor } from './features/auth/interceptors/auth.interceptor';
-
+import { registerLocaleData } from '@angular/common';
+import localeEsBo from '@angular/common/locales/es-BO';
+registerLocaleData(localeEsBo);
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,

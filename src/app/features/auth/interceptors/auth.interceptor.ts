@@ -23,11 +23,12 @@ export class AuthInterceptor implements HttpInterceptor {
 
         const excludedUrls = [
             '/auth/login/panel',
+            '/admin-auth/login',
             '/auth/login/mobile',
             '/auth/refresh'
         ];
 
-        const isExcluded = excludedUrls.some(url => request.url.includes(url));
+        const isExcluded = excludedUrls.some(url => request.url.toLowerCase().includes(url.toLowerCase()));
 
         if (isExcluded) {
             const clonedReq = request.clone({ withCredentials: true });
@@ -47,22 +48,22 @@ export class AuthInterceptor implements HttpInterceptor {
 
         return next.handle(authReq).pipe(
             catchError((error: HttpErrorResponse) => {
-                if (error.status === 401 && !request.url.includes('/auth/refresh')) {
+                const isLoginOrLogout = request.url.includes('/login') || request.url.includes('/logout');
+
+                if (error.status === 401 && !request.url.includes('/auth/refresh') && !isLoginOrLogout) {
+
                     return this.authService.refreshToken().pipe(
                         switchMap((response) => {
                             this.authService.setAccessToken(response.accessToken);
-
                             const retryReq = request.clone({
                                 setHeaders: {
                                     Authorization: `Bearer ${response.accessToken}`
                                 },
                                 withCredentials: true
                             });
-
                             return next.handle(retryReq);
                         }),
                         catchError((refreshError) => {
-                            console.error('AuthInterceptor: Refresh token failed', refreshError);
                             this.authService.logout();
                             this.router.navigate(['/auth']);
                             return throwError(() => refreshError);

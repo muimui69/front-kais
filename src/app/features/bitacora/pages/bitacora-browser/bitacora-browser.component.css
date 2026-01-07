@@ -1,0 +1,57 @@
+/* Arreglo para Material Form Field Outline en fondo blanco */
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none; /* Si quieres reducir espacio abajo si no usas hints */
+}
+
+/* Hace que el fondo del input sea blanco puro para que el label no se vea transparente */
+.mat-mdc-form-field {
+  background-color: white !important;
+}
+
+/* Opcional: Ajuste para inputs más compactos si usas Tailwind */
+.dense-form-field .mat-mdc-form-field-flex {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    align-items: center !important;
+}
+
+/* Ajuste fino para la tabla */
+.mat-mdc-header-row {
+    height: 48px !important; /* Cabecera más delgada y elegante */
+}
+
+
+/* 1. Elimina el espacio reservado para mensajes de error (subscript) que hace que el input se vea alto */
+::ng-deep .custom-input .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+}
+
+/* 2. Ajusta la altura y el radio del borde para que se vea moderno */
+::ng-deep .custom-input .mat-mdc-text-field-wrapper {
+    height: 48px; /* Altura fija más compacta */
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* 3. Centra el contenido verticalmente */
+::ng-deep .custom-input .mat-mdc-form-field-flex {
+    height: 100%;
+    align-items: center !important;
+    padding-top: 0 !important;
+}
+
+/* 4. Estilo del borde (gris suave) y fondo (blanco puro) */
+::ng-deep .custom-input .mdc-notched-outline__leading,
+::ng-deep .custom-input .mdc-notched-outline__notch,
+::ng-deep .custom-input .mdc-notched-outline__trailing {
+    border-color: #e2e8f0 !important; /* slate-200 de Tailwind */
+    background-color: #ffffff !important; /* Asegura fondo blanco */
+}
+
+/* 5. Efecto Focus: Borde azul índigo cuando haces click */
+::ng-deep .custom-input.mat-focused .mdc-notched-outline__leading,
+::ng-deep .custom-input.mat-focused .mdc-notched-outline__notch,
+::ng-deep .custom-input.mat-focused .mdc-notched-outline__trailing {
+    border-color: #6366f1 !important; /* indigo-500 */
+    border-width: 1px !important; /* Mantenemos borde fino, más elegante */
+}

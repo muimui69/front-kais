@@ -1,5 +1,6 @@
 export enum Menu {
   DASHBOARD = 'Dashboard',
+  CATEGORIAS_SERVICIOS = 'Categorías de Servicios',
   GESTION_USUARIOS = 'Gestión de Usuarios',
   VERIFICACION_PROFESIONALES = 'Verificación de Profesionales',
   REPORTES_ESTADISTICAS = 'Reportes y Estadísticas',

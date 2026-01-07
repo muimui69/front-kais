@@ -15,6 +15,14 @@ const routes: Routes = [
     loadChildren: () => import('../app/features/user-management/user-management.module').then(m => m.UserManagementModule),
   },
   {
+    path: 'categories',
+    loadChildren: () => import('../app/features/category/category.module').then(m => m.CategoryModule),
+  },
+  {
+    path: 'bitacora',
+    loadChildren: () => import('../app/features/bitacora/bitacora.module').then(m => m.BitacoraModule),
+  },
+  {
     path: '**',
     redirectTo: 'auth'
   }

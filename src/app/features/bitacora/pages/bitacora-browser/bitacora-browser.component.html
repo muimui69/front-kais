@@ -1,0 +1,164 @@
+<div class="min-h-screen bg-slate-50 p-4 md:p-8 font-sans">
+  <div class="max-w-7xl mx-auto space-y-6">
+
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Bitácora de Auditoría</h1>
+        <p class="text-slate-500 mt-1">Historial detallado de seguridad y movimientos</p>
+      </div>
+    </div>
+
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6" [formGroup]="filterForm">
+
+  <div class="mb-4 flex items-center gap-2 text-slate-400">
+    <mat-icon class="!w-5 !h-5 text-[20px]">tune</mat-icon>
+    <span class="text-xs font-bold uppercase tracking-wider">Filtros de Búsqueda</span>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+
+    <div class="md:col-span-4">
+      <label class="block text-sm font-medium text-slate-700 mb-2 ml-1">
+        Buscar por Acción
+      </label>
+      <mat-form-field appearance="outline" class="w-full no-bottom-space custom-input">
+        <mat-icon matPrefix class="text-slate-400 mr-2">search</mat-icon>
+        <input matInput formControlName="action" placeholder="Ej: LOGIN, CREATE...">
+        @if (filterForm.get('action')?.value) {
+          <button mat-icon-button matSuffix (click)="filterForm.get('action')?.setValue('')">
+            <mat-icon class="text-slate-400 !w-4 !h-4 text-[16px]">close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="md:col-span-5">
+      <label class="block text-sm font-medium text-slate-700 mb-2 ml-1">
+        Periodo de Tiempo
+      </label>
+      <mat-form-field appearance="outline" class="w-full no-bottom-space custom-input">
+        <mat-date-range-input [rangePicker]="picker" class="text-slate-600">
+          <input matStartDate formControlName="startDate" placeholder="Fecha inicio">
+          <input matEndDate formControlName="endDate" placeholder="Fecha fin">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker" class="text-slate-400"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+
+    <div class="md:col-span-3 flex justify-end">
+      <button mat-flat-button color="warn"
+              class="w-full md:w-auto !rounded-lg !h-[48px] !bg-red-50 !text-red-600 shadow-none hover:!bg-red-100 transition-all border border-red-100"
+              (click)="filterForm.reset()">
+        <mat-icon class="mr-1">restart_alt</mat-icon>
+        Restablecer
+      </button>
+    </div>
+
+  </div>
+</div>
+
+    <div class="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-200 overflow-hidden relative">
+
+      @if(loading) {
+        <div class="absolute inset-0 bg-white/80 z-20 flex items-center justify-center backdrop-blur-sm">
+          <div class="flex flex-col items-center gap-3">
+            <mat-spinner diameter="40" class="custom-spinner"></mat-spinner>
+            <span class="text-sm font-medium text-slate-500">Cargando registros...</span>
+          </div>
+        </div>
+      }
+
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="dataSource" class="w-full">
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef class="!pl-6 !font-bold !text-xs !uppercase !tracking-wider !text-slate-500 !bg-slate-50"> ID </th>
+            <td mat-cell *matCellDef="let element" class="!pl-6">
+              <span class="font-mono text-xs text-slate-400">#{{element.id}}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-500 !bg-slate-50"> Acción </th>
+            <td mat-cell *matCellDef="let element">
+              <span class="px-3 py-1 rounded-full text-[10px] font-bold tracking-wide border uppercase"
+                [ngClass]="{
+                  'bg-blue-50 text-blue-700 border-blue-200': element.action.includes('LOGIN') || element.action.includes('UPDATE'),
+                  'bg-green-50 text-green-700 border-green-200': element.action.includes('CREATE') || element.action.includes('POST'),
+                  'bg-red-50 text-red-700 border-red-200': element.action.includes('DELETE') || element.action.includes('ERROR'),
+                  'bg-purple-50 text-purple-700 border-purple-200': !element.action.includes('LOGIN') && !element.action.includes('CREATE') && !element.action.includes('DELETE')
+                }">
+                {{element.action}}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-500 !bg-slate-50"> Usuario </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="flex items-center gap-3 py-3">
+                <div class="h-9 w-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+                  {{ element.administrator?.user?.name?.charAt(0) || '?' }}
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-semibold text-slate-700 text-sm">
+                    {{ element.administrator?.user?.name }} {{ element.administrator?.user?.lastName }}
+                  </span>
+                  <span class="text-xs text-slate-400">{{ element.administrator?.user?.email }}</span>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-500 !bg-slate-50"> Descripción </th>
+            <td mat-cell *matCellDef="let element" class="max-w-xs">
+              <p class="text-slate-600 text-sm truncate pr-4" [title]="element.description">
+                {{element.description}}
+              </p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-500 !bg-slate-50"> Fecha </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="flex flex-col">
+                <span class="text-slate-600 text-sm font-medium">{{ element.createdAt | date:'mediumDate' }}</span>
+                <span class="text-slate-400 text-xs">{{ element.createdAt | date:'shortTime' }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="details">
+            <th mat-header-cell *matHeaderCellDef class="!bg-slate-50"></th>
+             <td mat-cell *matCellDef="let element"></td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              class="hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0"></tr>
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell text-center py-12" colspan="6">
+              <div class="flex flex-col items-center justify-center text-slate-400">
+                <mat-icon class="text-4xl mb-2 !h-10 !w-10">search_off</mat-icon>
+                <p>No se encontraron registros con esos filtros.</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator
+        class="border-t border-slate-100"
+        [length]="totalItems"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+
+  </div>
+</div>

@@ -1,187 +1,240 @@
+/* ============================================
+   VARIABLES Y CONFIGURACIÓN BASE
+   ============================================ */
+:host {
+  display: block;
+  height: 100vh;
+
+  /* PALETA DE COLORES */
+  --sidebar-width: 280px;
+  --sidebar-bg: #1a1d2e;           /* Fondo Oscuro */
+  --sidebar-text: #a0aec0;         /* Texto Gris Claro (Visible) */
+  --sidebar-text-hover: #ffffff;   /* Texto Blanco al pasar mouse */
+
+  --sidebar-active-bg: #f4d13f;    /* Amarillo Branding */
+  --sidebar-active-text: #1a1d2e;  /* Texto Oscuro para el botón amarillo */
+
+  --toolbar-height: 64px;
+  --border-color: rgba(255, 255, 255, 0.08); /* Borde sutil */
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+mat-sidenav-container {
+  height: 100%;
+  background: #f7fafc;
+}
+
+/* ============================================
+   SIDEBAR (CONTENEDOR)
+   ============================================ */
 .custom-sidenav {
-    background-color: #242b35 !important;
-    color: white !important;
-    min-width: 16rem !important;
-    width: 16rem !important;
-    border-right: none !important;
-    padding: 0 !important;
-    display: flex;
-    flex-direction: column;
+  width: var(--sidebar-width) !important;
+  background-color: var(--sidebar-bg) !important;
+  border-right: 1px solid var(--border-color) !important;
+  padding: 0 !important;
 }
 
-.custom-sidenav .mat-icon {
-    color: #bec8cc !important;
-    font-size: 20px !important;
-    width: 20px !important;
-    height: 20px !important;
+/* HEADER DEL SIDEBAR */
+.sidebar-header {
+  height: var(--toolbar-height);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.custom-expansion-panel .mat-expansion-panel-header {
-    margin: 2px 2px !important;
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
 }
 
-.custom-expansion-panel .mat-expansion-panel-header span {
-    font-size: 0.95rem !important;
-    margin-left: 10px;
-    font-weight: 400 !important;
-    color: #bec8cc !important;
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background-color: var(--sidebar-active-bg);
+  color: var(--sidebar-active-text);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 18px;
 }
 
-.custom-list-item {
-    font-size: 0.95rem !important;
-    font-weight: 400 !important;
-    transition: background 0.2s ease !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-    padding: 14px 20px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    cursor: pointer !important;
-    color: #bec8cc !important;
-    background: transparent !important;
-    width: 100% !important;
-    min-height: 48px !important;
+.logo-text {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.5px;
 }
 
-.custom-list-item .mdc-list-item__content {
-    color: #bec8cc !important;
+/* ============================================
+   NAVEGACIÓN (ITEMS)
+   ============================================ */
+.sidebar-nav {
+  padding: 16px 10px;
+  overflow-y: auto;
+  height: calc(100vh - var(--toolbar-height));
 }
 
-.custom-list-item span {
-    color: #bec8cc !important;
+/* ESTILO GENERAL DE ITEMS */
+.nav-item {
+  display: flex;
+  align-items: center;
+  height: 44px; /* Un poco más alto para elegancia */
+  padding: 0 16px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+
+  /* COLOR DEL TEXTO (AQUI ESTA EL ARREGLO) */
+  color: var(--sidebar-text) !important;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-.custom-list-item:hover {
-    background: #5c6c71 !important;
-    color: #ffffff !important;
+/* HOVER */
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--sidebar-text-hover) !important;
 }
 
-.custom-list-item:hover .mat-icon {
-    color: #ffffff !important;
+.nav-item:hover .nav-icon {
+  color: var(--sidebar-text-hover) !important;
 }
 
-.custom-list-item.active-link {
-    background: #725a1f !important;
-    color: #ffffff !important;
-    border-left: 3px solid #f4d13f !important;
-    padding-left: 17px !important;
+/* ESTADO ACTIVO (BOTÓN AMARILLO) */
+.nav-item.active {
+  background-color: var(--sidebar-active-bg) !important;
+  color: var(--sidebar-active-text) !important; /* TEXTO OSCURO */
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(244, 209, 63, 0.2);
 }
 
-.custom-list-item.active-link .mat-icon {
-    color: #f4d13f !important;
+.nav-item.active .nav-icon {
+  color: var(--sidebar-active-text) !important; /* ICONO OSCURO */
 }
 
-.custom-expansion-panel {
-    background: transparent !important;
-    box-shadow: none !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    width: 100% !important;
+/* ICONOS */
+.nav-icon {
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  margin-right: 12px !important;
+  color: var(--sidebar-text); /* Color gris por defecto */
+  flex-shrink: 0; /* Evita que se aplaste */
 }
 
-.custom-expansion-panel::before {
-    display: none !important;
+/* ETIQUETAS DE TEXTO (ARREGLO DE CORTE) */
+.nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
 }
 
-.custom-expansion-panel .mat-expansion-panel-header {
-    background: transparent !important;
-    border-radius: 0 !important;
-    padding: 14px 20px !important;
-    height: auto !important;
-    min-height: 48px !important;
-    transition: background 0.2s ease !important;
-    margin: 0 !important;
-    width: 100% !important;
+/* ============================================
+   SUBMENUS (EXPANSION PANELS) - CORRECCIÓN CRÍTICA
+   ============================================ */
+.nav-expansion {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
 }
 
-.custom-expansion-panel .mat-expansion-panel-header:hover {
-    background: #5c6c71 !important;
+/* FORZAR COLOR EN EL HEADER DEL ACORDEÓN */
+/* Usamos ::ng-deep para romper el estilo por defecto de Angular Material */
+.nav-expansion::ng-deep .mat-expansion-panel-header {
+  padding: 0 16px !important;
+  height: 44px !important;
+  font-family: inherit !important;
 }
 
-.custom-expansion-panel .mat-expansion-panel-header .mat-panel-title {
-    color: #bec8cc !important;
-    font-weight: 400 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
+.nav-expansion::ng-deep .mat-expansion-panel-header-title {
+  color: var(--sidebar-text) !important; /* FORZAMOS GRIS CLARO */
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 0 !important;
 }
 
-.custom-expansion-panel .mat-expansion-panel-header .mat-panel-title span {
-    color: #bec8cc !important;
+/* Hover en el acordeón */
+.nav-expansion::ng-deep .mat-expansion-panel-header:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+.nav-expansion::ng-deep .mat-expansion-panel-header:hover .mat-expansion-panel-header-title {
+  color: var(--sidebar-text-hover) !important;
+}
+.nav-expansion::ng-deep .mat-expansion-panel-header:hover .nav-icon {
+  color: var(--sidebar-text-hover) !important;
 }
 
-.custom-expansion-panel .mat-expansion-panel-header .mat-content {
-    color: #bec8cc !important;
+/* La flechita del acordeón */
+.nav-expansion::ng-deep .mat-expansion-indicator::after {
+  color: var(--sidebar-text) !important; /* Flecha Gris */
 }
 
-.custom-expansion-panel .mat-expansion-indicator::after {
-    color: #bec8cc !important;
+/* Cuerpo del submenú */
+.nav-expansion::ng-deep .mat-expansion-panel-body {
+  padding: 0 !important;
+  margin-top: 4px;
 }
 
-.custom-expansion-panel .mat-expansion-panel-body {
-    padding: 0 !important;
-    background: rgba(0, 0, 0, 0.25) !important;
-    margin: 0 !important;
+/* Items dentro del submenú */
+.nav-subitem {
+  padding-left: 48px !important; /* Indentación */
+  height: 40px !important;
+  font-size: 0.85rem !important;
 }
 
-.custom-expansion-panel .custom-list-item {
-    background: transparent !important;
-    color: #bec8cc !important;
-    /* padding: 12px 12px 12px 20px !important; */
-    font-size: 0.9rem !important;
-    margin: 0 !important;
-    width: 100% !important;
-    border-radius: 0 !important;
+/* ============================================
+   SCROLLBAR (ARREGLO DE LA BARRA BLANCA)
+   ============================================ */
+.sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.25);
 }
 
-.custom-expansion-panel .custom-list-item span {
-    color: #bec8cc !important;
+/* ============================================
+   TOOLBAR SUPERIOR (DERECHA)
+   ============================================ */
+.app-toolbar {
+  height: var(--toolbar-height);
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.custom-expansion-panel .custom-list-item:hover {
-    background: #5c6c71 !important;
-    color: #ffffff !important;
+.page-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
 }
 
-.custom-expansion-panel .custom-list-item.active-link {
-    background: #725a1f !important;
-    color: #ffffff !important;
-    border-left: 3px solid #f4d13f !important;
-    padding-left: 37px !important;
-}
-
-.custom-expansion-panel .custom-list-item.active-link .mat-icon {
-    color: #f4d13f !important;
-}
-
-@media (max-width: 600px) {
-    .custom-sidenav {
-        min-width: 100% !important;
-        width: 100% !important;
-    }
-}
-
-/* ===================================
-   SCROLLBAR
-   =================================== */
-.custom-sidenav::-webkit-scrollbar {
-    width: 5px;
-}
-
-.custom-sidenav::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.custom-sidenav::-webkit-scrollbar-thumb {
-    background: #5c6c71 !important;
-    border-radius: 3px;
-}
-
-.custom-sidenav::-webkit-scrollbar-thumb:hover {
-    background: #bec8cc !important;
-}
-
-::ng-deep .custom-expansion-panel .mat-expansion-panel-header .mat-expansion-indicator svg {
-    fill: #bec8cc !important;
+.page-content {
+  padding: 24px;
+  max-width: 100%;
 }

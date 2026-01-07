@@ -1,0 +1,161 @@
+<div class="browser-container p-8 max-w-7xl mx-auto min-h-screen bg-[#f8fafc]">
+
+  <div class="header mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+
+
+    <div class="flex items-center gap-4">
+      @if (currentParent) {
+        <button mat-icon-button (click)="goBack()" class="bg-white border border-gray-200 text-gray-500 hover:text-gray-800 transition-colors shadow-sm">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      }
+
+      <div>
+        <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">
+          {{ currentParent ? currentParent.name : 'Explorar Categorías' }}
+        </h2>
+        <p class="text-slate-500 font-medium mt-1 flex items-center gap-2">
+          @if(currentParent) {
+            <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs uppercase font-bold tracking-wider border border-slate-200">
+              Nivel {{ currentParent.level + 1 }}
+            </span>
+            <span>Dentro de {{ currentParent.name }}</span>
+          } @else {
+            <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-xs uppercase font-bold tracking-wider border border-indigo-100">
+              Nivel 1
+            </span>
+            <span>Categorías Principales</span>
+          }
+        </p>
+      </div>
+    </div>
+
+      <div class="flex-grow max-w-md mx-auto md:mx-0 md:ml-auto md:mr-4">
+     <mat-form-field appearance="outline" class="w-full dense-form-field bg-white rounded-lg">
+    <mat-icon matPrefix class="text-slate-400 ml-1">search</mat-icon>
+    <input type="text"
+           placeholder="Buscar categoría..."
+           matInput
+           [formControl]="searchControl"
+           [matAutocomplete]="auto">
+
+    <mat-autocomplete #auto="matAutocomplete"
+                      [displayWith]="displayFn"
+                      (optionSelected)="onSearchResultSelected($event)">
+
+      @for (option of searchResults$ | async; track option.id) {
+        <mat-option [value]="option">
+          <div class="flex flex-col py-1">
+            <span class="font-bold text-slate-700">{{ option.name }}</span>
+            <span class="text-xs text-slate-400">
+               {{ option.parent ? 'en ' + option.parent.name : 'Nivel Superior' }}
+            </span>
+          </div>
+        </mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+</div>
+
+
+    <button mat-flat-button color="primary" class="!rounded-lg !px-6 !py-6 shadow-md shadow-indigo-200" (click)="onCreateNew()">
+      <mat-icon class="mr-2">add</mat-icon> Nueva Categoría
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 animate-pulse">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="h-28 bg-slate-200 rounded-lg w-full"></div>
+      }
+    </div>
+  }
+
+  @if (!loading) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+
+      @for (category of categories; track category.id) {
+
+        @let color = getCategoryColor(category.level);
+
+        <div
+          class="group relative bg-white rounded-lg p-5 border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-center border-l-[6px]"
+          [ngClass]="[
+             'border-' + color + '-500',
+             'hover:border-' + color + '-600',
+             'hover:bg-' + color + '-50'
+          ]"
+          (click)="onCategoryClick(category)">
+
+          <div class="flex justify-between items-start w-full relative z-10">
+            <h3 class="text-lg font-bold text-slate-800 group-hover:text-slate-900 leading-tight mb-2 pr-8 break-words">
+              {{ category.name }}
+            </h3>
+
+            <div class="absolute -top-1 -right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+               <button
+                mat-icon-button
+                [matMenuTriggerFor]="menu"
+                (click)="$event.stopPropagation()"
+                class="!w-8 !h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-white/50 rounded-full">
+                <mat-icon class="!text-[20px] !w-[20px] !h-[20px] leading-none">more_vert</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 mt-1">
+             @if (category.level < MAX_LEVEL) {
+                <span
+                  class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border"
+                  [ngClass]="[
+                    'bg-' + color + '-100',
+                    'text-' + color + '-700',
+                    'border-' + color + '-200'
+                  ]">
+                  {{ category.childrenCount || 0 }} Subcategorías
+                </span>
+             } @else {
+                <span class="text-xs text-slate-400 italic font-medium flex items-center gap-1">
+                  <mat-icon class="!text-[14px] !w-[14px] !h-[14px] text-slate-300">check_circle</mat-icon>
+                  Nivel Final
+                </span>
+             }
+          </div>
+
+          <mat-menu #menu="matMenu" xPosition="before" class="!rounded-xl custom-menu">
+            <button mat-menu-item (click)="onViewDetails(category)">
+              <mat-icon class="text-slate-500">visibility</mat-icon>
+              <span class="text-slate-700">Ver detalles</span>
+            </button>
+            <button mat-menu-item (click)="onEdit(category)">
+              <mat-icon class="text-blue-500">edit</mat-icon>
+              <span class="text-slate-700">Editar</span>
+            </button>
+            <mat-divider class="!my-1"></mat-divider>
+            <button mat-menu-item (click)="onDelete(category)">
+              <mat-icon class="text-red-500">delete</mat-icon>
+              <span class="text-red-600 font-medium">Eliminar</span>
+            </button>
+          </mat-menu>
+
+        </div>
+      }
+    </div>
+
+    @if (categories.length === 0) {
+      <div class="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-white">
+        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+          <mat-icon class="!w-8 !h-8 !text-[32px] text-slate-300">folder_open</mat-icon>
+        </div>
+        <h3 class="text-lg font-bold text-slate-700">Carpeta vacía</h3>
+        <p class="text-slate-500 text-sm max-w-xs mx-auto mb-6">
+          No hay subcategorías en este nivel todavía.
+        </p>
+        <button mat-stroked-button color="primary" (click)="onCreateNew()">
+          Crear Categoría
+        </button>
+      </div>
+    }
+  }
+
+  </div>

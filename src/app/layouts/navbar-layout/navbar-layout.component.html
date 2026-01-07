@@ -1,88 +1,88 @@
-<div class="h-screen flex flex-col">
-  <!-- Toolbar con fondo blanco -->
-  <mat-toolbar color="primary" class="flex justify-between items-center px-4">
-    <div class="flex items-center gap-3">
-      <button mat-icon-button (click)="snav.toggle()">
-        <mat-icon>menu</mat-icon>
-      </button>
+<mat-sidenav-container class="h-screen w-full" autosize>
+
+  <mat-sidenav
+    #snav
+    [mode]="mobileQuery.matches ?  'over' : 'side'"
+    [fixedInViewport]="mobileQuery.matches"
+    fixedTopGap="0"
+    [opened]="! mobileQuery.matches"
+    class="custom-sidenav">
+
+    <!-- Header Limpio -->
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <div class="logo-icon">T</div>
+        <span class="logo-text">TeBusco</span>
+      </div>
     </div>
 
-    <div class="flex items-center gap-2">
-      <shared-user-avatar-menu />
-    </div>
-  </mat-toolbar>
+    <!-- Navegación -->
+    <nav class="sidebar-nav">
+      @for (nav of fillerNav; track nav) {
 
-  <mat-sidenav-container class="flex-1 h-full">
-    <mat-sidenav
-      #snav
-      [mode]="mobileQuery.matches ? 'over' : 'side'"
-      [fixedInViewport]="mobileQuery.matches"
-      fixedTopGap="64"
-      class="custom-sidenav"
-      [opened]="!mobileQuery.matches">
+        @if (! nav.items || nav.items. length === 0) {
+          <a
+            [routerLink]="nav.router"
+            class="nav-item"
+            [class.active]="isActive(nav.router)"
+            matRipple>
+            <mat-icon class="nav-icon">{{nav. icon}}</mat-icon>
+            <span class="nav-label">{{nav.name}}</span>
+          </a>
+        }
 
-      <div class="px-5 py-6 border-b border-[#5c6c71] border-opacity-10">
-        <div class="flex items-center gap-3">
-          <div
-            class="w-10 h-10 bg-[#f4d13f] rounded-lg flex items-center justify-center">
-            <mat-icon class="!text-[#242b35]">search</mat-icon>
-          </div>
-          <div>
-            <h2 class="text-base font-semibold text-white">TeBusco</h2>
-            <p class="text-xs text-gray-400">Descripcion de ejemplo</p>
-          </div>
-        </div>
+        @if (nav. items && nav.items.length > 0) {
+          <mat-expansion-panel class="nav-expansion">
+            <mat-expansion-panel-header class="expansion-header">
+              <mat-panel-title class="expansion-title">
+                <mat-icon class="nav-icon">{{nav.icon}}</mat-icon>
+                <span class="nav-label">{{nav.name}}</span>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="expansion-content">
+              @for (item of nav.items; track item) {
+                <a
+                  [routerLink]="item.router"
+                  class="nav-item nav-subitem"
+                  [class. active]="isActive(item. router)"
+                  matRipple>
+                  <mat-icon class="nav-icon">{{item.icon}}</mat-icon>
+                  <span class="nav-label">{{item.name}}</span>
+                </a>
+              }
+            </div>
+          </mat-expansion-panel>
+        }
+      }
+    </nav>
+
+  </mat-sidenav>
+
+
+  <mat-sidenav-content class="main-content">
+
+    <!-- Toolbar Minimalista -->
+    <header class="app-toolbar">
+      <div class="toolbar-left">
+        <button mat-icon-button (click)="snav.toggle()" class="menu-btn">
+          <mat-icon>menu</mat-icon>
+        </button>
+       </div>
+
+      <div class="toolbar-right">
+        <button mat-icon-button class="toolbar-btn">
+          <mat-icon>notifications_none</mat-icon>
+          <span class="notification-dot"></span>
+        </button>
+        <shared-user-avatar-menu />
       </div>
+    </header>
 
-      <!-- Menu items SIN clases de padding -->
-      <div class="flex-1 overflow-y-auto">
-        @for (nav of fillerNav; track nav) {
-        @if (!nav.items || nav.items.length === 0) {
-        <!-- Item simple -->
-        <mat-list-item
-          [routerLink]="nav.router"
-          (click)="mobileQuery.matches && snav.toggle()"
-          class="custom-list-item"
-          [ngClass]="{'active-link': isActive(nav.router)}">
-          <mat-icon matListItemIcon>{{nav.icon}}</mat-icon>
-          <span matListItemTitle>{{nav.name}}</span>
-        </mat-list-item>
-        }
-
-        @if (nav.items && nav.items.length > 0) {
-        <!-- Item con submenú -->
-        <mat-expansion-panel class="custom-expansion-panel">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <mat-icon>{{nav.icon}}</mat-icon>
-              <span>{{nav.name}}</span>
-            </mat-panel-title>
-            @if (nav.items.length > 0) {
-            <!-- <span
-              class="ml-auto bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
-              {{nav.items.length}}
-            </span> -->
-            }
-          </mat-expansion-panel-header>
-
-          @for (item of nav.items; track item) {
-          <mat-list-item
-            [routerLink]="item.router"
-            (click)="mobileQuery.matches && snav.toggle()"
-            class="custom-list-item"
-            [ngClass]="{'active-link': isActive(item.router)}">
-            <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
-            <span matListItemTitle>{{item.name}}</span>
-          </mat-list-item>
-          }
-        </mat-expansion-panel>
-        }
-        }
-      </div>
-    </mat-sidenav>
-
-    <mat-sidenav-content class="p-6 bg-gray-50">
+    <!-- Contenido -->
+    <main class="page-content">
       <router-outlet></router-outlet>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
-</div>
+    </main>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,4 +1,4 @@
-// import { Role } from "../roles/role.enum";
+
 
 import { Menu } from "../enums/menu-enum/menu-Enum";
 
@@ -9,7 +9,7 @@ export const menuItem = [
     router: '/dashboard',
     items: []
   },
-  {
+  /*{
     name: Menu.GESTION_USUARIOS,
     icon: 'group',
     router: 'users',
@@ -38,30 +38,21 @@ export const menuItem = [
         router: '/verificacion-profesionales/verificados',
       },
     ]
-  },
+  },*/
   {
     name: Menu.REPORTES_ESTADISTICAS,
     icon: 'bar_chart',
     router: '',
     items: [
       {
-        name: 'General',
+        name: 'Bitacora General',
         icon: 'assessment',
-        router: '/reportes-estadisticas/general',
+        router: '/bitacora',
       },
-      {
-        name: 'Por Usuario',
-        icon: 'person_search',
-        router: '/reportes-estadisticas/usuarios',
-      },
-      {
-        name: 'Suscripciones',
-        icon: 'subscriptions',
-        router: '/reportes-estadisticas/suscripciones',
-      },
+
     ]
   },
-  {
+  /*{
     name: Menu.MODERACION_CONTENIDO,
     icon: 'gavel',
     router: '',
@@ -129,5 +120,11 @@ export const menuItem = [
     icon: 'support_agent',
     router: '/soporte',
     items: []
-  },
+  },*/
+  {
+    name: Menu.CATEGORIAS_SERVICIOS,
+    icon: 'category',
+    router: '/categories/category',
+    items: []
+  }
 ]
