@@ -147,6 +147,15 @@ export class CategoryFormComponent implements OnInit {
     });
   }
 
+  verificionlevel3(data:any){
+      if(data.level == 3){
+          return true;
+      }else{
+          return false;
+      }
+
+  }
+
   save() {
     if (this.form.invalid) return;
 
@@ -176,7 +185,12 @@ export class CategoryFormComponent implements OnInit {
       this.categoryService.create(data).subscribe({
         next: (res) => {
           this.showNotification('Categoría creada con éxito', 'success');
-          this.router.navigate(['/categories/category', res.data.id]);
+
+         if( this.verificionlevel3(res.data)){
+            this.router.navigate(['/categories/category', res.data.parent?.id]);
+         }else{
+            this.router.navigate(['/categories/category', res.data.id]);
+         }
         },
         error: (err) => {
           this.showNotification(err.error?.message || 'Error al crear', 'error');

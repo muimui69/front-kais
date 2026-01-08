@@ -1,57 +1,181 @@
-/* Arreglo para Material Form Field Outline en fondo blanco */
-::ng-deep .mat-mdc-form-field-subscript-wrapper {
-  display: none; /* Si quieres reducir espacio abajo si no usas hints */
-}
-
-/* Hace que el fondo del input sea blanco puro para que el label no se vea transparente */
-.mat-mdc-form-field {
-  background-color: white !important;
-}
-
-/* Opcional: Ajuste para inputs más compactos si usas Tailwind */
-.dense-form-field .mat-mdc-form-field-flex {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    align-items: center !important;
-}
-
-/* Ajuste fino para la tabla */
-.mat-mdc-header-row {
-    height: 48px !important; /* Cabecera más delgada y elegante */
-}
-
-
-/* 1. Elimina el espacio reservado para mensajes de error (subscript) que hace que el input se vea alto */
+/* Corrección: Eliminado espacio en ::ng-deep y .custom-input */
 ::ng-deep .custom-input .mat-mdc-form-field-subscript-wrapper {
-    display: none;
+  display: none;
 }
 
-/* 2. Ajusta la altura y el radio del borde para que se vea moderno */
+/* Corrección: Sintaxis corregida en selectores y !important */
 ::ng-deep .custom-input .mat-mdc-text-field-wrapper {
-    height: 48px; /* Altura fija más compacta */
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+  height: 52px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  background: #ffffff;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 3. Centra el contenido verticalmente */
 ::ng-deep .custom-input .mat-mdc-form-field-flex {
-    height: 100%;
-    align-items: center !important;
-    padding-top: 0 !important;
+  height: 100%;
+  align-items: center !important;
+  padding-top: 0 !important;
 }
 
-/* 4. Estilo del borde (gris suave) y fondo (blanco puro) */
+/* Corrección: Selectores agrupados correctamente */
 ::ng-deep .custom-input .mdc-notched-outline__leading,
 ::ng-deep .custom-input .mdc-notched-outline__notch,
 ::ng-deep .custom-input .mdc-notched-outline__trailing {
-    border-color: #e2e8f0 !important; /* slate-200 de Tailwind */
-    background-color: #ffffff !important; /* Asegura fondo blanco */
+  border-color: #e2e8f0 !important;
+  border-width: 1.5px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 5. Efecto Focus: Borde azul índigo cuando haces click */
+::ng-deep .custom-input:hover .mdc-notched-outline__leading,
+::ng-deep .custom-input:hover .mdc-notched-outline__notch,
+::ng-deep .custom-input:hover .mdc-notched-outline__trailing {
+  border-color: #cbd5e1 !important;
+}
+
 ::ng-deep .custom-input.mat-focused .mdc-notched-outline__leading,
 ::ng-deep .custom-input.mat-focused .mdc-notched-outline__notch,
 ::ng-deep .custom-input.mat-focused .mdc-notched-outline__trailing {
-    border-color: #6366f1 !important; /* indigo-500 */
-    border-width: 1px !important; /* Mantenemos borde fino, más elegante */
+  border-color: #6366f1 !important;
+  border-width: 2px !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+::ng-deep .custom-input .mat-mdc-input-element {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+::ng-deep .custom-input .mat-mdc-input-element::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1;
+  font-weight: 400;
+}
+
+::ng-deep .custom-input .mat-mdc-floating-label {
+  color: #64748b !important;
+  font-weight: 500;
+}
+
+::ng-deep .custom-input.mat-focused .mat-mdc-floating-label {
+  color: #6366f1 !important;
+}
+
+::ng-deep .custom-input .mat-mdc-form-field-icon-prefix,
+::ng-deep .custom-input .mat-mdc-form-field-icon-suffix {
+  color: #94a3b8;
+}
+
+::ng-deep .custom-input.mat-focused .mat-mdc-form-field-icon-prefix {
+  color: #6366f1;
+}
+
+::ng-deep .mat-mdc-table {
+  background: transparent;
+}
+
+::ng-deep .mat-mdc-header-row {
+  height: 56px !important;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.8) 100%);
+  backdrop-filter: blur(10px);
+}
+
+::ng-deep .mat-mdc-header-cell {
+  color: #475569 !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+  border-bottom: 2px solid #e2e8f0 !important;
+}
+
+::ng-deep .mat-mdc-row {
+  height: 72px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::ng-deep .mat-mdc-row:hover {
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.03) 100%);
+  transform: scale(1.001);
+  box-shadow: inset 4px 0 0 #6366f1;
+}
+
+::ng-deep .mat-mdc-cell {
+  color: #1e293b;
+  font-size: 0.9375rem;
+  border-bottom-color: #f1f5f9 !important;
+  padding: 1rem 1rem;
+}
+
+::ng-deep .mat-mdc-paginator {
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 0 0 1rem 1rem;
+}
+
+::ng-deep .mat-mdc-paginator-container {
+  padding: 1rem 1.5rem;
+  min-height: 64px;
+}
+
+::ng-deep .mat-mdc-paginator-page-size-label,
+::ng-deep .mat-mdc-paginator-range-label {
+  color: #64748b;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+::ng-deep .custom-spinner circle {
+  stroke: #6366f1;
+  stroke-width: 3px;
+}
+
+/* Corrección: Eliminado espacio en selectores de clase */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.no-bottom-space {
+  margin-bottom: 0 !important;
+}
+
+::ng-deep .no-bottom-space .mat-mdc-form-field-bottom-align {
+  display: none;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.space-y-6 > * {
+  animation: fadeInUp 0.5s ease-out backwards;
+}
+
+.space-y-6 > *:nth-child(1) { animation-delay: 0.1s; }
+.space-y-6 > *:nth-child(2) { animation-delay: 0.2s; }
+.space-y-6 > *:nth-child(3) { animation-delay: 0.3s; }
+
+@media (max-width: 768px) {
+  ::ng-deep .mat-mdc-cell,
+  ::ng-deep .mat-mdc-header-cell {
+    padding: 0.75rem 0.5rem;
+  }
+
+  ::ng-deep .mat-mdc-row {
+    height: auto;
+    min-height: 64px;
+  }
 }

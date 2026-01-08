@@ -15,7 +15,7 @@ export class BitacoraBrowserComponent implements OnInit {
   private bitacoraService = inject(BitacoraService);
   private fb = inject(FormBuilder);
 
-  displayedColumns: string[] = ['id', 'action', 'user', 'description', 'date', 'details'];
+  displayedColumns: string[] = ['id', 'action', 'user', 'description', 'date'];
 
   dataSource: Bitacora[] = [];
   totalItems = 0;
