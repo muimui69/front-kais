@@ -1,0 +1,218 @@
+<div class="config-container">
+
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon-box">
+        <mat-icon>tune</mat-icon>
+      </div>
+      <div class="header-titles">
+        <h1>Configuración del Programa</h1>
+        <p>Define las reglas, recompensas y límites del sistema</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="goToHistory()">
+        <mat-icon>history</mat-icon> Ver Historial
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando configuración...</p>
+    </div>
+  } @else {
+
+    <form [formGroup]="configForm" class="config-grid">
+
+      <div class="settings-column">
+
+        <mat-card class="setting-card main-status-card">
+          <div class="card-row">
+            <div class="status-info">
+              <h3>Estado del Programa</h3>
+              <p>Habilita o deshabilita la generación de nuevos códigos.</p>
+            </div>
+            <mat-slide-toggle formControlName="isActive" color="primary" class="scale-toggle">
+              <span class="toggle-label">
+                {{ configForm.get('isActive')?.value ? 'ACTIVO' : 'INACTIVO' }}
+              </span>
+            </mat-slide-toggle>
+          </div>
+        </mat-card>
+
+        <mat-card class="setting-card referrer-card">
+          <div class="card-header-styled blue-header">
+            <mat-icon>person_add</mat-icon>
+            <span>Configuración del Referidor (Quien invita)</span>
+          </div>
+
+          <div class="card-body">
+            <div class="input-group">
+              <label class="input-label">Tipo de Recompensa</label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="clean-field">
+                <mat-select formControlName="referrerRewardType">
+                  <mat-option value="credit">💰 Crédito en Billetera</mat-option>
+                  <mat-option value="coupon">🎟️ Cupón de Descuento</mat-option>
+                  <mat-option value="both">🎁 Ambos (Crédito + Cupón)</mat-option>
+                  <mat-option value="none">❌ Sin Recompensa</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="rewards-grid">
+              @if (shouldShowReferrerCredit()) {
+                <div class="input-group">
+                  <label class="input-label">Monto del Crédito</label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="clean-field">
+                    <span matTextPrefix class="currency-prefix">Bs&nbsp;</span>
+                    <input matInput type="number" formControlName="referrerCreditAmount" min="0" placeholder="0.00">
+                  </mat-form-field>
+                </div>
+              }
+
+              @if (shouldShowReferrerCoupon()) {
+                <div class="input-group">
+                  <label class="input-label">Seleccionar Cupón</label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="clean-field">
+                    <mat-select formControlName="referrerCouponCode" placeholder="Seleccione un cupón">
+                      @for (coupon of availableCoupons(); track coupon.id) {
+                        <mat-option [value]="coupon.code">
+                          <span class="coupon-option-code">{{ coupon.code }}</span>
+                          <span class="coupon-option-name"> - {{ coupon.name }}</span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              }
+            </div>
+          </div>
+        </mat-card>
+
+        <mat-card class="setting-card referred-card">
+          <div class="card-header-styled green-header">
+            <mat-icon>card_giftcard</mat-icon>
+            <span>Configuración del Referido (Invitado)</span>
+          </div>
+
+          <div class="card-body">
+            <div class="input-group">
+              <label class="input-label">Tipo de Recompensa</label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="clean-field">
+                <mat-select formControlName="referredRewardType">
+                  <mat-option value="credit">💰 Crédito en Billetera</mat-option>
+                  <mat-option value="coupon">🎟️ Cupón de Descuento</mat-option>
+                  <mat-option value="both">🎁 Ambos (Crédito + Cupón)</mat-option>
+                  <mat-option value="none">❌ Sin Recompensa</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="rewards-grid">
+              @if (shouldShowReferredCredit()) {
+                <div class="input-group">
+                  <label class="input-label">Monto del Crédito</label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="clean-field">
+                    <span matTextPrefix class="currency-prefix">Bs&nbsp;</span>
+                    <input matInput type="number" formControlName="referredCreditAmount" min="0" placeholder="0.00">
+                  </mat-form-field>
+                </div>
+              }
+
+              @if (shouldShowReferredCoupon()) {
+                <div class="input-group">
+                  <label class="input-label">Seleccionar Cupón</label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="clean-field">
+                    <mat-select formControlName="referredCouponCode" placeholder="Seleccione un cupón">
+                      @for (coupon of availableCoupons(); track coupon.id) {
+                        <mat-option [value]="coupon.code">
+                          <span class="coupon-option-code">{{ coupon.code }}</span>
+                          <span class="coupon-option-name"> - {{ coupon.name }}</span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              }
+            </div>
+          </div>
+        </mat-card>
+
+      </div>
+
+      <div class="summary-column">
+        <div class="sticky-wrapper">
+
+          <mat-card class="summary-card">
+            <mat-card-header>
+              <mat-card-title>Resumen</mat-card-title>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="timeline-preview">
+
+                <div class="timeline-item">
+                  <div class="timeline-dot blue"></div>
+                  <div class="timeline-content">
+                    <small>Referidor recibe:</small>
+                    <div class="reward-preview">
+                      {{ formatRewardSummary(
+                          configForm.get('referrerRewardType')?.value,
+                          configForm.get('referrerCreditAmount')?.value,
+                          configForm.get('referrerCouponCode')?.value
+                      ) }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="timeline-connector"></div>
+
+                <div class="timeline-item">
+                  <div class="timeline-dot green"></div>
+                  <div class="timeline-content">
+                    <small>Referido recibe:</small>
+                    <div class="reward-preview">
+                      {{ formatRewardSummary(
+                          configForm.get('referredRewardType')?.value,
+                          configForm.get('referredCreditAmount')?.value,
+                          configForm.get('referredCouponCode')?.value
+                      ) }}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="meta-info" *ngIf="currentProgram()">
+                 <mat-icon>update</mat-icon>
+                 <span>Actualizado: {{ currentProgram()!.updatedAt | date:'mediumDate' }}</span>
+              </div>
+
+            </mat-card-content>
+
+            <mat-card-actions class="actions-vertical">
+              <button
+                mat-flat-button
+                color="primary"
+                class="btn-block btn-lg"
+                (click)="onSave()"
+                [disabled]="saving() || configForm.invalid">
+                @if (saving()) { <mat-spinner diameter="20"></mat-spinner> }
+                @else { <mat-icon>save</mat-icon> }
+                Guardar Cambios
+              </button>
+
+              <button mat-stroked-button color="warn" class="btn-block" (click)="onReset()">
+                <mat-icon>restart_alt</mat-icon> Descartar Cambios
+              </button>
+            </mat-card-actions>
+          </mat-card>
+
+        </div>
+      </div>
+
+    </form>
+  }
+</div>

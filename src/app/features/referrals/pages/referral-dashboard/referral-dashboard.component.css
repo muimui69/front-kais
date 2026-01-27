@@ -1,0 +1,250 @@
+/* --- Layout General --- */
+.dashboard-container {
+  padding: 30px;
+  background-color: #f8f9fe; /* Fondo gris muy suave para toda la página */
+  min-height: 100vh;
+  font-family: 'Roboto', 'Helvetica', sans-serif;
+}
+
+/* --- Header --- */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-content h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #32325d; /* Azul oscuro casi negro */
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.subtitle {
+  color: #8898aa;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Botones personalizados */
+.header-actions button {
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Stats Cards (Diseño mejorado) --- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  border: none;
+  /* Sombra suave y flotante */
+  box-shadow: 0 0 2rem 0 rgba(136, 152, 170, 0.15);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Bordes laterales de color */
+.stat-card.blue-accent { border-left: 5px solid #5e72e4; }
+.stat-card.green-accent { border-left: 5px solid #2dce89; }
+.stat-card.orange-accent { border-left: 5px solid #fb6340; }
+.stat-card.purple-accent { border-left: 5px solid #5603ad; }
+
+.stat-card mat-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px !important;
+}
+
+.stat-info h3 {
+  color: #8898aa;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  color: #32325d;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Iconos circulares con fondo suave */
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.stat-icon.total { background: rgba(94, 114, 228, 0.15); color: #5e72e4; }
+.stat-icon.completed { background: rgba(45, 206, 137, 0.15); color: #2dce89; }
+.stat-icon.pending { background: rgba(251, 99, 64, 0.15); color: #fb6340; }
+.stat-icon.rewards { background: rgba(86, 3, 173, 0.15); color: #5603ad; }
+
+/* --- Filtros (Barra blanca flotante) --- */
+.filters-card {
+  border-radius: 8px;
+  box-shadow: 0 0 2rem 0 rgba(136, 152, 170, 0.15);
+  margin-bottom: 24px;
+  border: none;
+  background: white;
+}
+
+.filters-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.search-field { flex: 1; font-size: 14px; }
+.filter-field { width: 220px; font-size: 14px; }
+
+/* --- Tabla (Estilo limpio) --- */
+.table-card {
+  border-radius: 8px;
+  box-shadow: 0 0 2rem 0 rgba(136, 152, 170, 0.15);
+  border: none;
+  background: white;
+  overflow: hidden; /* Para redondear esquinas */
+}
+
+.referrals-table {
+  width: 100%;
+}
+
+.referrals-table th {
+  background-color: #f6f9fc;
+  color: #8898aa;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #e9ecef;
+  padding: 16px 24px;
+}
+
+.referrals-table td {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e9ecef;
+  color: #525f7f;
+  font-size: 14px;
+}
+
+.referrals-table tr:hover {
+  background-color: #f8f9fe;
+}
+
+/* User Info con Avatar Circular */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  background-color: #e9ecef;
+  color: #5e72e4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.user-name {
+  margin: 0;
+  font-weight: 600;
+  color: #32325d;
+  font-size: 14px;
+}
+
+.user-email {
+  margin: 0;
+  color: #8898aa;
+  font-size: 12px;
+}
+
+/* Badges de estado modernos */
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Punto indicador en el badge */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-completed { background: rgba(45, 206, 137, 0.1); color: #2dce89; }
+.status-completed .status-dot { background: #2dce89; }
+
+.status-pending { background: rgba(251, 99, 64, 0.1); color: #fb6340; }
+.status-pending .status-dot { background: #fb6340; }
+
+.status-expired { background: rgba(245, 54, 92, 0.1); color: #f5365c; }
+.status-expired .status-dot { background: #f5365c; }
+
+/* Recompensa */
+.reward-amount {
+  font-weight: 700;
+  color: #2dce89;
+  font-family: 'Courier New', monospace;
+}
+
+/* Paginador limpio */
+::ng-deep .mat-mdc-paginator {
+  border-top: 1px solid #e9ecef;
+  background: white;
+}

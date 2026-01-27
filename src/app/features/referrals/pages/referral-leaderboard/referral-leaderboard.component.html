@@ -1,0 +1,175 @@
+<div class="leaderboard-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>
+        <mat-icon>leaderboard</mat-icon>
+        Leaderboard de Referidos
+      </h1>
+      <p class="subtitle">Top referidores del programa</p>
+    </div>
+    <div class="header-actions">
+      <button mat-raised-button (click)="goToDashboard()">
+        <mat-icon>dashboard</mat-icon>
+        Dashboard
+      </button>
+      <button mat-raised-button (click)="goToConfig()">
+        <mat-icon>settings</mat-icon>
+        Configuración
+      </button>
+      <button mat-icon-button (click)="refresh()" matTooltip="Actualizar">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtro de Límite -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <div class="filter-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Mostrar</mat-label>
+          <mat-select [formControl]="limitControl">
+            <mat-option *ngFor="let option of limitOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>filter_list</mat-icon>
+        </mat-form-field>
+        <p class="filter-hint">
+          <mat-icon>info</mat-icon>
+          Mostrando los {{ limitControl.value }} mejores referidores
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Cargando leaderboard...</p>
+  </div>
+
+  <!-- Tabla de Leaderboard -->
+  <mat-card class="leaderboard-card" *ngIf="!loading()">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" class="leaderboard-table">
+          
+          <!-- Columna: Ranking -->
+          <ng-container matColumnDef="rank">
+            <th mat-header-cell *matHeaderCellDef>Pos.</th>
+            <td mat-cell *matCellDef="let entry" [ngClass]="getRankClass(entry.rank!)">
+              <div class="rank-cell">
+                <span class="rank-emoji" *ngIf="entry.rank! <= 3">{{ getRankIcon(entry.rank!) }}</span>
+                <span class="rank-number">{{ entry.rank }}</span>
+                <mat-icon *ngIf="entry.rank === 1" class="crown-icon">emoji_events</mat-icon>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Columna: Profesional -->
+          <ng-container matColumnDef="professionalName">
+            <th mat-header-cell *matHeaderCellDef>Profesional</th>
+            <td mat-cell *matCellDef="let entry">
+              <div class="professional-info">
+                <mat-icon class="professional-icon">person</mat-icon>
+                <div>
+                  <p class="professional-name">{{ entry.professionalName }}</p>
+                  <p class="professional-email" *ngIf="entry.professionalEmail">{{ entry.professionalEmail }}</p>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Columna: Código -->
+          <ng-container matColumnDef="code">
+            <th mat-header-cell *matHeaderCellDef>Código</th>
+            <td mat-cell *matCellDef="let entry">
+              <span class="code-badge">{{ entry.code }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Columna: Total Referidos -->
+          <ng-container matColumnDef="totalReferrals">
+            <th mat-header-cell *matHeaderCellDef>Total Referidos</th>
+            <td mat-cell *matCellDef="let entry">
+              <div class="stat-value">
+                <mat-icon>group</mat-icon>
+                <span>{{ entry.totalReferrals }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Columna: Total Recompensas -->
+          <ng-container matColumnDef="totalEarnings">
+            <th mat-header-cell *matHeaderCellDef>Recompensas</th>
+            <td mat-cell *matCellDef="let entry">
+              <div class="reward-value">
+                <mat-icon>account_balance_wallet</mat-icon>
+                <span>{{ formatRewards(entry.totalEarnings) }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+              [ngClass]="getRankClass(row.rank!)">
+          </tr>
+
+          <!-- Mensaje cuando no hay datos -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              <div class="no-data">
+                <mat-icon>emoji_events</mat-icon>
+                <p>No hay datos de leaderboard disponibles</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Podio Top 3 (solo si hay datos) -->
+  <div class="podium-section" *ngIf="!loading() && dataSource.data.length >= 3">
+    <h2>
+      <mat-icon>emoji_events</mat-icon>
+      Podio
+    </h2>
+    <div class="podium">
+      <!-- Segundo lugar -->
+      <div class="podium-place second" *ngIf="dataSource.data[1]">
+        <div class="podium-medal">🥈</div>
+        <div class="podium-info">
+          <p class="podium-rank">#2</p>
+          <p class="podium-name">{{ dataSource.data[1].professionalName }}</p>
+          <p class="podium-stats">{{ dataSource.data[1].totalReferrals }} referidos</p>
+          <p class="podium-rewards">{{ formatRewards(dataSource.data[1].totalEarnings) }}</p>
+        </div>
+      </div>
+
+      <!-- Primer lugar -->
+      <div class="podium-place first" *ngIf="dataSource.data[0]">
+        <div class="podium-medal winner">🥇</div>
+        <div class="podium-info">
+          <p class="podium-rank">#1</p>
+          <p class="podium-name">{{ dataSource.data[0].professionalName }}</p>
+          <p class="podium-stats">{{ dataSource.data[0].totalReferrals }} referidos</p>
+          <p class="podium-rewards">{{ formatRewards(dataSource.data[0].totalEarnings) }}</p>
+        </div>
+      </div>
+
+      <!-- Tercer lugar -->
+      <div class="podium-place third" *ngIf="dataSource.data[2]">
+        <div class="podium-medal">🥉</div>
+        <div class="podium-info">
+          <p class="podium-rank">#3</p>
+          <p class="podium-name">{{ dataSource.data[2].professionalName }}</p>
+          <p class="podium-stats">{{ dataSource.data[2].totalReferrals }} referidos</p>
+          <p class="podium-rewards">{{ formatRewards(dataSource.data[2].totalEarnings) }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+:host {
+  display: block;
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-form-field-flex {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  padding: 0 16px !important;
+  transition: all 0.2s ease-in-out;
+  height: 48px !important;
+  align-items: center !important;
+}
+
+::ng-deep .mdc-notched-outline,
+::ng-deep .mdc-line-ripple {
+  display: none !important;
+}
+
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-form-field-flex {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+}
+
+
+::ng-deep .mat-form-field-invalid .mat-mdc-form-field-flex {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+}
+
+::ng-deep .mat-mdc-input-element,
+::ng-deep .mat-mdc-select-value {
+  font-weight: 500 !important;
+  color: #1f2937 !important;
+}
+
+::ng-deep .mat-mdc-form-field-infix {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  min-height: auto !important;
+  border: none !important;
+}
+
+::ng-deep .mat-mdc-select-arrow {
+  color: #9ca3af !important;
+}

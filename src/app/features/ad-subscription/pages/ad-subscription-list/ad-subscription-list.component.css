@@ -1,0 +1,59 @@
+/* Animación de entrada */
+.fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === OVERRIDES DE TABLA MATERIAL === */
+
+::ng-deep table.mat-mdc-table {
+  background: transparent !important;
+}
+
+/* Header de la Tabla */
+::ng-deep .mat-mdc-header-row {
+  background-color: #f9fafb !important; /* Gray 50 */
+  height: 48px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+::ng-deep .mat-mdc-header-cell {
+  color: #6b7280 !important; /* Gray 500 */
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0 24px !important;
+}
+
+/* Filas del cuerpo */
+::ng-deep .mat-mdc-row {
+  height: 80px !important; /* Más altura para acomodar la imagen y fechas */
+  border-bottom: 1px solid #f3f4f6 !important;
+}
+
+::ng-deep .mat-mdc-cell {
+  font-size: 14px !important;
+  color: #1f2937 !important; /* Gray 800 */
+  padding: 0 24px !important;
+}
+
+/* Paginador limpio */
+::ng-deep .mat-mdc-paginator {
+  background: transparent !important;
+}
+::ng-deep .mat-mdc-paginator-container {
+  min-height: 48px !important;
+  padding: 0 24px !important;
+}
+
+/* Menu popup */
+::ng-deep .mat-mdc-menu-panel {
+  border-radius: 12px !important;
+  padding: 4px 0 !important;
+}

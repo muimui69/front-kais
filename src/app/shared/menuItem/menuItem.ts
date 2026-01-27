@@ -126,5 +126,44 @@ export const menuItem = [
     icon: 'category',
     router: '/categories/category',
     items: []
-  }
+  },
+  {
+    name: Menu.EMPRESAS_SUSCRIPCIONES,
+    icon: 'bar_chart',
+    router: '',
+    items: [
+      {
+        name: 'Suscripciones Empresas',
+        icon: 'business_center',
+        router: '/ad-subscriptions',
+      },
+      {
+        name: 'Empresas',
+        icon: 'business',
+        router: '/companies',
+      },
+      {
+        name: 'Publicidad',
+        icon: 'campaign',
+        router: '/publicidad/ads',
+      },
+      {
+        name: 'Planes de Publicidad',
+        icon: 'monetization_on',
+        router: '/ad-plans',
+      },
+      {
+        name: 'Cupones',
+        icon: 'local_offer',
+        router: '/coupons',
+      },
+      {
+        name: 'Referidos',
+        icon: 'people',
+        router: '/referrals',
+      }
+
+    ]
+  },
+
 ]

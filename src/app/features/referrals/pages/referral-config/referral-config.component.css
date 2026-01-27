@@ -1,0 +1,178 @@
+/* --- 1. Layout General --- */
+.config-container {
+  padding: 24px;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* --- 2. Header (Igual que historial) --- */
+.page-header {
+  background: white;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header-content { display: flex; gap: 16px; align-items: center; }
+.header-icon-box {
+  width: 48px; height: 48px;
+  background: #f0fdf4; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid #dcfce7;
+}
+.header-icon-box mat-icon { color: #15803d; font-size: 24px; }
+.header-titles h1 { font-size: 18px; font-weight: 700; margin: 0; color: #111827; }
+.header-titles p { margin: 4px 0 0 0; color: #6b7280; font-size: 13px; }
+
+/* --- 3. Grid Principal (Layout 2 Columnas) --- */
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px; /* Columna Izq flexible, Derecha fija 320px */
+  gap: 24px;
+  align-items: start;
+}
+
+.settings-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- 4. Tarjetas de Configuración --- */
+.setting-card {
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+  border: 1px solid #e5e7eb;
+  padding: 0 !important; /* Reset padding de Material */
+  overflow: hidden;
+  background: white;
+}
+
+/* Tarjeta de Estado Principal */
+.main-status-card {
+  padding: 24px !important;
+}
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.status-info h3 { margin: 0 0 4px 0; font-size: 16px; font-weight: 600; }
+.status-info p { margin: 0; color: #6b7280; font-size: 14px; }
+.scale-toggle { transform: scale(1.2); transform-origin: right center; }
+.toggle-label { font-weight: 700; font-size: 12px; margin-left: 8px; }
+
+/* Headers Estilizados (Azul / Verde) */
+.card-header-styled {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.blue-header { background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; }
+.green-header { background: #f0fdf4; color: #166534; border-left: 4px solid #22c55e; }
+
+.card-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+/* Grid interno para recompensas */
+.rewards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* --- 5. Inputs (Label Outside - Mismo estilo que Historial) --- */
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+.input-label { font-size: 13px; font-weight: 600; color: #374151; margin-left: 1px; }
+
+/* Overrides para Inputs Limpios */
+::ng-deep .clean-field .mat-mdc-text-field-wrapper {
+  background-color: white !important;
+  height: 44px !important;
+  padding: 0 12px !important;
+}
+::ng-deep .clean-field .mat-mdc-form-field-infix {
+  padding-top: 10px !important; padding-bottom: 10px !important; min-height: 44px !important;
+}
+::ng-deep .clean-field .mdc-notched-outline__leading,
+::ng-deep .clean-field .mdc-notched-outline__notch,
+::ng-deep .clean-field .mdc-notched-outline__trailing {
+  border-color: #d1d5db !important; border-width: 1px !important;
+}
+::ng-deep .clean-field.mat-focused .mdc-notched-outline__leading, /* Focus state */
+::ng-deep .clean-field.mat-focused .mdc-notched-outline__notch,
+::ng-deep .clean-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #3b82f6 !important; border-width: 2px !important;
+}
+::ng-deep .clean-field .mdc-notched-outline__notch { border-top-width: 1px !important; }
+
+/* Opciones de cupón estilizadas */
+.coupon-option-code { font-weight: 700; color: #3b82f6; font-family: monospace; }
+.coupon-option-name { color: #6b7280; font-size: 13px; }
+
+/* --- 6. Columna Derecha Sticky --- */
+.summary-column { position: relative; }
+.sticky-wrapper { position: sticky; top: 24px; }
+
+.summary-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+  border: none;
+}
+
+/* Timeline Visual en Resumen */
+.timeline-preview {
+  position: relative;
+  padding: 0 0 16px 16px;
+  border-left: 2px solid #e5e7eb;
+  margin-left: 8px;
+}
+
+.timeline-item { position: relative; margin-bottom: 24px; }
+
+.timeline-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  position: absolute; left: -23px; top: 4px;
+  border: 2px solid white; box-shadow: 0 0 0 2px #e5e7eb;
+}
+.timeline-dot.blue { background: #3b82f6; box-shadow: 0 0 0 2px #dbeafe; }
+.timeline-dot.green { background: #22c55e; box-shadow: 0 0 0 2px #dcfce7; }
+
+.timeline-content small {
+  display: block; color: #6b7280; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+}
+.reward-preview {
+  font-weight: 600; color: #111827; font-size: 14px;
+  background: #f9fafb; padding: 8px; border-radius: 6px; border: 1px solid #f3f4f6;
+}
+
+.meta-info {
+  display: flex; align-items: center; gap: 6px;
+  color: #9ca3af; font-size: 12px; margin-top: 12px;
+  border-top: 1px solid #f3f4f6; padding-top: 12px;
+}
+.meta-info mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+/* Botones Grandes */
+.actions-vertical {
+  display: flex; flex-direction: column; gap: 12px; padding: 16px !important;
+}
+.btn-block { width: 100%; margin: 0 !important; }
+.btn-lg { height: 48px; font-size: 15px; }
+
+/* --- 7. Responsive --- */
+@media (max-width: 900px) {
+  .config-grid { grid-template-columns: 1fr; }
+  .sticky-wrapper { position: static; }
+  .rewards-grid { grid-template-columns: 1fr; }
+}

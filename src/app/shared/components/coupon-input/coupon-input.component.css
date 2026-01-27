@@ -1,0 +1,31 @@
+.coupon-input-container {
+  width: 100%;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+/* Asegurar que el hint sea visible */
+mat-hint {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Estilos para el spinner */
+mat-spinner {
+  display: inline-block;
+}
+
+/* Animación para los íconos */
+mat-icon {
+  transition: all 0.3s ease;
+}
+
+mat-icon.text-green-600 {
+  color: #16a34a;
+}
+
+mat-icon.text-red-600 {
+  color: #dc2626;
+}

@@ -1,0 +1,237 @@
+<div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white sticky top-0 z-10">
+  <div class="flex items-center gap-3">
+    <div class="bg-blue-50 p-2 rounded-lg text-blue-600">
+      <mat-icon>monetization_on</mat-icon>
+    </div>
+    <div>
+      <h2 mat-dialog-title class="!p-0 !m-0 text-lg font-bold text-gray-900 tracking-tight leading-tight">
+        Nueva Suscripción
+      </h2>
+      <p class="text-xs text-gray-500 font-medium">Configura el plan para este anuncio</p>
+    </div>
+  </div>
+
+  <button mat-icon-button (click)="close()" class="text-gray-400 hover:text-gray-600 -mr-2">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="!p-0">
+
+  <div class="flex flex-col md:flex-row h-full">
+
+    <div class="w-full md:w-7/12 p-6 md:p-8 space-y-6 overflow-y-auto">
+
+      <div class="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+        <div class="h-16 w-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100 relative group">
+          <img *ngIf="data.advertisement.imageUrl"
+               [src]="imgUrl(data.advertisement)"
+               class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div *ngIf="!data.advertisement.imageUrl" class="flex items-center justify-center h-full text-gray-300">
+            <mat-icon>image</mat-icon>
+          </div>
+        </div>
+        <div class="overflow-hidden flex-1 py-1">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600 uppercase tracking-wider mb-1">
+            Empresa
+          </span>
+          <p class="text-sm font-bold text-gray-900 truncate">{{ data.advertisement.companyName }}</p>
+          <div class="flex items-center gap-1 mt-1 text-xs text-blue-600 font-medium bg-blue-50 inline-block px-1.5 py-0.5 rounded">
+             {{ data.advertisement.actionType }}
+          </div>
+        </div>
+      </div>
+
+      <form [formGroup]="form" class="space-y-5">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-2 ml-1">1. Elige un Plan</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-select formControlName="planId" placeholder="Seleccionar opción...">
+              <mat-option *ngFor="let plan of plans" [value]="plan.id">
+                <div class="flex justify-between w-full items-center py-1">
+                  <span class="font-medium text-gray-900">{{ plan.name }}</span>
+                  <span class="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 font-bold border border-gray-200">
+                    {{ plan.price  }}
+                  </span>
+                </div>
+              </mat-option>
+            </mat-select>
+            <mat-error>Requerido</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-2 ml-1">2. Inicio de Vigencia</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput type="date" formControlName="startDate">
+            <mat-icon matSuffix class="text-gray-400">calendar_today</mat-icon>
+            <mat-error>Requerido</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- SECCIÓN CUPÓN DE DESCUENTO -->
+        <div class="mt-2">
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-2 ml-1">
+            Código de Descuento (Opcional)
+          </label>
+          
+          <div class="flex gap-2">
+            <mat-form-field appearance="outline" class="flex-1">
+              <input 
+                matInput 
+                formControlName="couponCode"
+                placeholder="Ej: CUPONSJV8AH"
+                [disabled]="hasCoupon"
+                class="uppercase"
+                (keyup.enter)="applyCoupon()">
+              <mat-icon matPrefix class="text-gray-400">local_offer</mat-icon>
+            </mat-form-field>
+
+            <button 
+              *ngIf="!hasCoupon"
+              mat-flat-button
+              type="button"
+              (click)="applyCoupon()"
+              [disabled]="!form.get('couponCode')?.value || isValidatingCoupon"
+              class="!px-5 !py-2 !rounded-lg !font-medium !bg-blue-600 !text-white hover:!bg-blue-700 disabled:!bg-gray-300">
+              <mat-spinner diameter="16" *ngIf="isValidatingCoupon" class="inline-block mr-1"></mat-spinner>
+              <span *ngIf="!isValidatingCoupon">Aplicar</span>
+              <span *ngIf="isValidatingCoupon">Verificando...</span>
+            </button>
+
+            <button 
+              *ngIf="hasCoupon"
+              mat-icon-button
+              type="button"
+              (click)="removeCoupon()"
+              class="text-red-500 hover:bg-red-50"
+              matTooltip="Quitar cupón">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <!-- Mensaje de éxito -->
+          <div *ngIf="hasCoupon" class="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg animate-fade-in">
+            <div class="flex items-center gap-2 text-green-700 text-sm">
+              <mat-icon class="text-green-600 text-lg">check_circle</mat-icon>
+              <span class="font-semibold">¡Cupón aplicado!</span>
+            </div>
+            <p class="text-xs text-green-600 mt-1 ml-7">
+              Código: <strong>{{ couponCode }}</strong> • 
+              Descuento: <strong>{{ discountAmount }} BOB</strong>
+            </p>
+          </div>
+
+          <!-- Mensaje de error -->
+          <p *ngIf="couponError && !hasCoupon" class="text-xs text-red-600 mt-1 ml-1 animate-fade-in">
+            <mat-icon class="text-xs align-middle mr-1">error</mat-icon>
+            {{ couponError }}
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <div class="w-full md:w-5/12 bg-slate-50 border-t md:border-t-0 md:border-l border-gray-200 p-6 md:p-8 flex flex-col justify-between">
+
+      <div>
+        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide mb-6 flex items-center gap-2">
+          <mat-icon class="text-gray-400 text-lg h-5 w-5">receipt</mat-icon> Resumen de Orden
+        </h3>
+
+        <div *ngIf="!selectedPlan" class="text-center py-10 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
+          <mat-icon class="block mx-auto mb-2 text-3xl">ads_click</mat-icon>
+          <p class="text-xs">Selecciona un plan a la izquierda para ver el cálculo.</p>
+        </div>
+
+        <div *ngIf="selectedPlan && endDatePreview" class="animate-fade-in space-y-6">
+
+          <div class="space-y-4">
+            <div class="flex justify-between items-center group">
+              <span class="text-sm text-gray-500">Plan Base</span>
+              <span class="text-sm font-semibold text-gray-900">{{ selectedPlan.name }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">Duración</span>
+              <span class="text-sm font-semibold text-gray-900 bg-white px-2 py-0.5 rounded border border-gray-200 shadow-sm">
+                {{ selectedPlan.durationInDays }} días
+              </span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">Fecha Fin</span>
+              <span class="text-sm font-semibold text-blue-600">{{ endDatePreview | date:'mediumDate' }}</span>
+            </div>
+
+            <!-- Desglose de precio con descuento -->
+            <div *ngIf="hasCoupon" class="border-t border-gray-200 border-dashed pt-3 animate-fade-in">
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-500">Precio original</span>
+                <span class="text-gray-900">{{ originalPrice }} BOB</span>
+              </div>
+              <div class="flex justify-between items-center text-sm mt-2">
+                <span class="text-green-600 font-medium">Descuento ({{ couponCode }})</span>
+                <span class="text-green-600 font-bold">-{{ discountAmount }} BOB</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-gray-200 border-dashed"></div>
+
+          <div>
+             <div class="flex justify-between items-end mb-1">
+                <span class="text-sm font-bold text-gray-700">Total a Pagar</span>
+                <div class="text-right">
+                  <!-- Precio original tachado si hay descuento -->
+                  <span *ngIf="hasCoupon" class="text-sm text-gray-400 line-through mr-2">
+                    {{ originalPrice }} BOB
+                  </span>
+                  <span class="text-3xl font-black text-gray-900 tracking-tight">
+                    {{ displayPrice }} BOB
+                  </span>
+                </div>
+             </div>
+             <p class="text-[10px] text-gray-400 text-right">
+               {{ hasCoupon ? 'Precio con descuento aplicado' : 'Impuestos incluidos si aplican' }}
+             </p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="mt-8 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
+        <div class="flex gap-2">
+          <p class="text-[11px] text-blue-700/80 leading-relaxed">
+            Al confirmar, el anuncio pasará a estado <strong>ACTIVO</strong> inmediatamente si la fecha de inicio es hoy.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="!p-6 bg-gray-50/80 border-t border-gray-100 gap-3 backdrop-blur-sm">
+
+  <button mat-button
+          (click)="close()"
+          class="!px-6 !py-2.5 !rounded-xl !text-gray-500 !font-medium hover:!bg-gray-200/50 hover:!text-gray-800 transition-all duration-200">
+    Cancelar
+  </button>
+
+  <button mat-flat-button
+          (click)="submit()"
+          [disabled]="form.invalid || isLoading"
+          class="!px-8 !py-2.5 !rounded-xl !font-bold !text-white transition-all duration-200
+                 bg-gradient-to-r from-blue-600 to-indigo-600
+                 hover:from-blue-500 hover:to-indigo-500
+                 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50
+                 hover:-translate-y-0.5 disabled:!bg-gray-300 disabled:!shadow-none disabled:!translate-y-0">
+
+      <div class="flex items-center gap-2">
+        <mat-spinner diameter="18" *ngIf="isLoading" class="text-white/80"></mat-spinner>
+        <span *ngIf="!isLoading">Confirmar y Activar</span>
+        <span *ngIf="isLoading">Procesando...</span>
+      </div>
+
+  </button>
+</mat-dialog-actions>

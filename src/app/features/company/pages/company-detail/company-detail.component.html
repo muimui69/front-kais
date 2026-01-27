@@ -1,0 +1,113 @@
+<div class="min-h-screen bg-gray-50 pb-20 pt-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-5xl mx-auto">
+
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <button mat-icon-button routerLink="/companies" class="text-gray-500 hover:bg-gray-100">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <h1 class="text-2xl font-bold text-gray-900 tracking-tight m-0">Detalle de Empresa</h1>
+        </div>
+        <p class="text-sm text-gray-500 ml-12">
+          Vista completa de la información del cliente.
+        </p>
+      </div>
+
+      <div class="flex gap-3" *ngIf="company">
+        <button mat-flat-button color="primary" [routerLink]="['/companies/edit', company.id]" class="rounded-lg">
+          <mat-icon class="mr-2">edit</mat-icon> Editar Información
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="flex justify-center p-12">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="!isLoading && company" class="grid grid-cols-1 lg:grid-cols-3 gap-8 fade-in">
+
+      <div class="lg:col-span-2 space-y-6">
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+            <h3 class="text-base font-semibold text-gray-800">Datos Generales</h3>
+          </div>
+
+          <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4">
+
+            <div class="col-span-2">
+              <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Razón Social</label>
+              <div class="text-lg font-medium text-gray-900 flex items-center gap-2">
+                <mat-icon class="text-gray-400">store</mat-icon>
+                {{ company.businessName }}
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Teléfono</label>
+              <div class="text-base text-gray-700 flex items-center gap-2">
+                <mat-icon class="text-gray-400 text-sm h-5 w-5">phone</mat-icon>
+                {{ company.contactPhone || 'No registrado' }}
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Fecha Registro</label>
+              <div class="text-base text-gray-700 flex items-center gap-2">
+                <mat-icon class="text-gray-400 text-sm h-5 w-5">calendar_today</mat-icon>
+                {{ company.createdAt | date:'longDate' }}
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="space-y-6">
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Estado de Cuenta</h3>
+
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0">
+              <span class="flex h-3 w-3 rounded-full"
+                    [ngClass]="company.isActive ? 'bg-green-500' : 'bg-red-500'"></span>
+            </div>
+            <div>
+              <p class="text-base font-medium text-gray-900">
+                {{ company.isActive ? 'Activo' : 'Inactivo' }}
+              </p>
+              <p class="text-xs text-gray-500">
+                {{ company.isActive ? 'Visible en plataforma' : 'Oculto para usuarios' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 rounded-xl shadow-sm border border-blue-100 p-6">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-blue-900 font-bold text-sm">Publicidad</h3>
+            <mat-icon class="text-blue-300">campaign</mat-icon>
+          </div>
+
+          <div class="mb-4">
+            <p class="text-3xl font-bold text-blue-700">
+              {{ company.advertisementsCount || 0 }}
+            </p>
+            <p class="text-xs text-blue-600">Artes publicitarios registrados</p>
+          </div>
+
+          <button mat-raised-button color="primary"
+                  [routerLink]="['/publicidad/ads/company', company.id]"
+                  class="w-full">
+            Gestionar Anuncios
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

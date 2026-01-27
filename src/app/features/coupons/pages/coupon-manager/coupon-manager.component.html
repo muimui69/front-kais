@@ -1,0 +1,161 @@
+<div class="p-8 bg-gray-50 min-h-screen">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-semibold text-gray-800">Gestión de Cupones</h1>
+    <button mat-flat-button color="primary" (click)="createCoupon()" class="rounded-md">
+      <mat-icon>add</mat-icon>
+      Nuevo Cupón
+    </button>
+  </div>
+
+  <div class="bg-white border border-gray-200 rounded-t-xl p-4 flex flex-wrap items-center gap-4">
+    <div class="flex-1 min-w-[300px]">
+      <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Buscar</label>
+      <div class="relative">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="search()"
+          placeholder="Código, nombre..."
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+        >
+        <mat-icon class="absolute right-3 top-2.5 text-gray-400">search</mat-icon>
+      </div>
+    </div>
+
+    <div class="w-48">
+      <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Estado</label>
+      <select [(ngModel)]="filters.isActive" (change)="applyFilters()" class="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none">
+        <option [ngValue]="undefined">Todos</option>
+        <option [ngValue]="true">Activos</option>
+        <option [ngValue]="false">Inactivos</option>
+      </select>
+    </div>
+
+    <div class="w-48">
+      <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Alcance</label>
+      <select [(ngModel)]="filters.appliesTo" (change)="applyFilters()" class="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none">
+        <option [ngValue]="undefined">Cualquiera</option>
+        <option value="plans">Planes</option>
+        <option value="extras">Extras</option>
+      </select>
+    </div>
+
+    <button mat-icon-button class="mt-5 text-gray-500" (click)="clearFilters()">
+      <mat-icon>filter_list_off</mat-icon>
+    </button>
+  </div>
+
+  <div class="bg-white border border-gray-200 border-t-0 rounded-b-xl overflow-hidden shadow-sm">
+    <table mat-table [dataSource]="dataSource" class="w-full">
+
+      <ng-container matColumnDef="code">
+        <th mat-header-cell *matHeaderCellDef class="table-header">CÓDIGO</th>
+        <td mat-cell *matCellDef="let coupon" class="py-5 font-bold text-gray-700">
+          {{coupon.code}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef class="table-header">DESCRIPCIÓN</th>
+        <td mat-cell *matCellDef="let coupon" class="py-5">
+          <div class="font-medium text-gray-800">{{coupon.name || 'Descuento'}}</div>
+          <div class="text-xs text-gray-400">{{translateAppliesTo(coupon.appliesTo)}}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="discountType">
+        <th mat-header-cell *matHeaderCellDef class="table-header">TIPO</th>
+        <td mat-cell *matCellDef="let coupon" class="text-gray-500 capitalize">
+          {{coupon.discountType === 'percentage' ? 'Porcentaje' : 'Fijo'}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="discountValue">
+        <th mat-header-cell *matHeaderCellDef class="table-header">VALOR</th>
+        <td mat-cell *matCellDef="let coupon" class="font-bold text-gray-800">
+          {{formatDiscount(coupon)}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="currentUses">
+        <th mat-header-cell *matHeaderCellDef class="table-header text-center">PROGRESO</th>
+        <td mat-cell *matCellDef="let coupon" class="w-48">
+          <div class="flex flex-col items-center">
+            <mat-progress-bar
+              mode="determinate"
+              [value]="getUsagePercentage(coupon)"
+              [class.bar-inactive]="!coupon.isActive"
+              class="h-1.5 rounded-full w-32 mb-2">
+            </mat-progress-bar>
+            <span class="text-[10px] font-bold text-gray-400 tracking-widest">
+              {{coupon.timesUsed}} / {{coupon.maxTotalUses || '∞'}}
+            </span>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="validUntil">
+        <th mat-header-cell *matHeaderCellDef class="table-header">VÁLIDO HASTA</th>
+        <td mat-cell *matCellDef="let coupon" class="text-gray-600">
+          {{coupon.validUntil | date:'dd/MM/yyyy'}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="isActive">
+        <th mat-header-cell *matHeaderCellDef class="table-header text-center">ESTADO</th>
+        <td mat-cell *matCellDef="let coupon" class="text-center">
+          <span class="status-chip" [ngClass]="{
+            'status-chip-active': coupon.isActive && !isExpired(coupon.validUntil),
+            'status-chip-inactive': !coupon.isActive,
+            'status-chip-expired': isExpired(coupon.validUntil) && coupon.isActive
+          }">
+            {{ isExpired(coupon.validUntil) ? 'Expirado' : (coupon.isActive ? 'Activo' : 'Inactivo') }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="table-header text-right px-6">ACCIONES</th>
+        <td mat-cell *matCellDef="let coupon" class="text-right px-6">
+          <button mat-icon-button [matMenuTriggerFor]="menu" class="text-gray-400">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="editCoupon(coupon.id)">
+              <mat-icon>edit</mat-icon>
+              <span>Editar</span>
+            </button>
+            <button mat-menu-item (click)="viewStats(coupon.id)">
+              <mat-icon>bar_chart</mat-icon>
+              <span>Ver estadísticas</span>
+            </button>
+            <button mat-menu-item (click)="toggleActive(coupon)">
+              <mat-icon>{{coupon.isActive ? 'toggle_on' : 'toggle_off'}}</mat-icon>
+              <span>{{coupon.isActive ? 'Desactivar' : 'Activar'}}</span>
+            </button>
+            <button mat-menu-item (click)="deleteCoupon(coupon.id, coupon.code)" class="text-red-600">
+              <mat-icon>delete</mat-icon>
+              <span>Eliminar</span>
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 transition-colors border-b border-gray-100"></tr>
+    </table>
+
+    <div class="p-4 bg-white border-t border-gray-100 flex justify-end items-center gap-8 text-xs text-gray-500 font-medium">
+      <div class="flex items-center gap-2">
+        Items por página: 10 <mat-icon class="text-sm h-4 w-4">arrow_drop_down</mat-icon>
+      </div>
+      <div>1 – 10 de 124</div>
+      <div class="flex gap-4">
+        <mat-icon class="cursor-pointer">first_page</mat-icon>
+        <mat-icon class="cursor-pointer">chevron_left</mat-icon>
+        <mat-icon class="cursor-pointer">chevron_right</mat-icon>
+        <mat-icon class="cursor-pointer">last_page</mat-icon>
+      </div>
+    </div>
+  </div>
+</div>

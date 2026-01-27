@@ -9,10 +9,12 @@ import { MaterialModule } from './shared/material.module';
 import { AuthInterceptor } from './features/auth/interceptors/auth.interceptor';
 import { registerLocaleData } from '@angular/common';
 import localeEsBo from '@angular/common/locales/es-BO';
+import { GrantCreditsComponent } from './features/credits/pages/grant-credits/grant-credits.component';
 registerLocaleData(localeEsBo);
 @NgModule({
   declarations: [
     AppComponent,
+    GrantCreditsComponent,
   ],
   imports: [
     BrowserModule,

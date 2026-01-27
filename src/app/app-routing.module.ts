@@ -23,6 +23,30 @@ const routes: Routes = [
     loadChildren: () => import('../app/features/bitacora/bitacora.module').then(m => m.BitacoraModule),
   },
   {
+    path: 'publicidad',
+    loadChildren: () => import('../app/features/advertising/advertising.module').then(m => m.AdvertisingModule),
+  },
+  {
+    path: 'companies',
+    loadChildren: () => import('../app/features/company/company.module').then(m => m.CompanyModule),
+  },
+  {
+    path: 'ad-plans',
+    loadChildren: () => import('../app/features/ad-plan/ad-plan.module').then(m => m.AdPlanModule),
+  },
+  {
+    path: 'ad-subscriptions',
+    loadChildren: () => import('../app/features/ad-subscription/ad-subscription.module').then(m => m.AdSubscriptionModule),
+  },
+  {
+    path: 'coupons',
+    loadChildren: () => import('../app/features/coupons/coupons.module').then(m => m.CouponsModule),
+  },
+  {
+    path: 'referrals',
+    loadChildren: () => import('../app/features/referrals/referrals.module').then(m => m.ReferralsModule),
+  },
+  {
     path: '**',
     redirectTo: 'auth'
   }

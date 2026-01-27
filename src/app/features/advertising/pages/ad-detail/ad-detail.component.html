@@ -1,0 +1,51 @@
+<div class="min-h-screen bg-gray-50 pb-20 pt-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-2">
+        <button mat-icon-button routerLink="/publicidad/ads" class="text-gray-500 hover:bg-gray-100">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1 class="text-2xl font-bold text-gray-900 m-0">Detalle del Anuncio</h1>
+      </div>
+
+      <button *ngIf="ad" mat-flat-button color="primary" [routerLink]="['/publicidad/ads/edit', ad.id]" class="rounded-lg">
+        <mat-icon class="mr-2">edit</mat-icon> Editar
+      </button>
+    </div>
+
+    <div *ngIf="isLoading" class="flex justify-center p-12">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="!isLoading && ad" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+        <div class="w-full bg-gray-100 flex justify-center py-8 border-b border-gray-100">
+            <img [src]="imageUrl" class="max-h-[500px] shadow-lg rounded-lg object-contain bg-white">
+        </div>
+
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Empresa Cliente</h3>
+                <div class="flex items-center gap-2">
+                    <mat-icon class="text-gray-400">business</mat-icon>
+                    <p class="text-lg font-medium text-gray-900">{{ ad.companyName }}</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Configuración de Acción</h3>
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-xs font-semibold text-blue-600 uppercase">{{ ad.actionType }}</span>
+                        <span class="text-gray-700 font-mono text-sm break-all flex items-center gap-2">
+                            <mat-icon class="text-sm h-4 w-4">link</mat-icon> {{ ad.actionValue }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  </div>
+</div>

@@ -3,6 +3,7 @@ export enum Menu {
   CATEGORIAS_SERVICIOS = 'Categorías de Servicios',
   GESTION_USUARIOS = 'Gestión de Usuarios',
   VERIFICACION_PROFESIONALES = 'Verificación de Profesionales',
+  EMPRESAS_SUSCRIPCIONES = 'Empresas y Suscripciones',
   REPORTES_ESTADISTICAS = 'Reportes y Estadísticas',
   MODERACION_CONTENIDO = 'Moderación de Contenido',
   SOLICITUDES_SERVICIO = 'Solicitudes de Servicio',

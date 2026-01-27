@@ -1,0 +1,106 @@
+<div class="min-h-screen bg-gray-50 pb-20 pt-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Empresas</h1>
+        <p class="text-sm text-gray-500 mt-1">Gestiona los clientes y sus estados.</p>
+      </div>
+      <button mat-flat-button color="primary" routerLink="/companies/create" class="rounded-lg !py-6">
+        <mat-icon class="mr-2">add</mat-icon> Nueva Empresa
+      </button>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+      <div class="p-4 border-b border-gray-100 flex items-center gap-3">
+        <mat-icon class="text-gray-400">search</mat-icon>
+        <input class="w-full outline-none text-sm text-gray-700 placeholder-gray-400"
+               placeholder="Buscar por nombre, teléfono..."
+               (keyup)="applyFilter($event)">
+      </div>
+
+      <div *ngIf="isLoading" class="p-8 flex justify-center">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div class="overflow-x-auto" *ngIf="!isLoading">
+        <table mat-table [dataSource]="dataSource" class="w-full">
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef class="!font-bold !text-gray-700"> ID </th>
+            <td mat-cell *matCellDef="let row" class="text-gray-500"> #{{row.id}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="businessName">
+            <th mat-header-cell *matHeaderCellDef class="!font-bold !text-gray-700"> Empresa </th>
+            <td mat-cell *matCellDef="let row">
+              <span class="font-medium text-gray-800">{{row.businessName}}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="contactPhone">
+            <th mat-header-cell *matHeaderCellDef class="!font-bold !text-gray-700"> Teléfono </th>
+            <td mat-cell *matCellDef="let row" class="text-gray-600"> {{row.contactPhone || '---'}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef class="!font-bold !text-gray-700"> Registro </th>
+            <td mat-cell *matCellDef="let row" class="text-gray-500 text-xs">
+              {{row.createdAt | date:'mediumDate'}}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="!font-bold !text-gray-700"> Estado </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-slide-toggle color="primary"
+                                [checked]="row.isActive"
+                                (change)="toggleStatus(row)"
+                                matTooltip="Activar/Desactivar">
+              </mat-slide-toggle>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="!text-right !pr-6"> </th>
+            <td mat-cell *matCellDef="let row" class="!text-right !pr-4">
+              <button mat-icon-button [matMenuTriggerFor]="menu" class="text-gray-400 hover:text-gray-600">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu" xPosition="before">
+                <button mat-menu-item [routerLink]="['/companies/view', row.id]">
+                  <mat-icon>visibility</mat-icon> Ver Detalles
+                </button>
+                <button mat-menu-item [routerLink]="['/companies/edit', row.id]">
+                  <mat-icon>edit</mat-icon> Editar
+                </button>
+                <button mat-menu-item [routerLink]="['/publicidad/ads/company', row.id]">
+                  <mat-icon>campaign</mat-icon> Gestionar Publicidad
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="deleteCompany(row.id)" class="!text-red-600">
+                  <mat-icon class="!text-red-600">delete</mat-icon> Eliminar
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 transition-colors"></tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator>
+      </div>
+
+      <div *ngIf="!isLoading && dataSource.data.length === 0" class="p-10 text-center">
+        <div class="inline-block p-4 rounded-full bg-gray-100 mb-4">
+          <mat-icon class="text-gray-400 text-4xl w-10 h-10">domain_disabled</mat-icon>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900">No hay empresas registradas</h3>
+        <p class="text-gray-500 mt-1">Comienza creando una nueva empresa.</p>
+      </div>
+
+    </div>
+  </div>
+</div>

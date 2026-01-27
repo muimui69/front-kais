@@ -1,0 +1,371 @@
+<div class="min-h-screen bg-gray-50 p-8">
+  <!-- Header -->
+  <div class="max-w-7xl mx-auto mb-6">
+    <div class="flex items-center gap-4 mb-2">
+      <button mat-icon-button (click)="cancel()" class="text-gray-600 hover:text-gray-800">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1 class="text-2xl font-semibold text-gray-800">{{pageTitle()}}</h1>
+    </div>
+    <p class="text-sm text-gray-600 ml-14">
+      {{isEditMode ? 'Modifica los campos que desees actualizar' : 'Completa los campos para crear un nuevo cupón'}}
+    </p>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading()" class="flex flex-col items-center justify-center py-20">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="mt-4 text-gray-600">Cargando datos...</p>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="form" (ngSubmit)="save()" *ngIf="!isLoading()">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- COLUMNA IZQUIERDA -->
+      <div class="space-y-6">
+        
+        <!-- Card: Información Básica -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <div class="flex items-center gap-2 mb-6">
+            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+            <h2 class="text-base font-semibold text-gray-800">Información Básica</h2>
+          </div>
+
+          <div class="space-y-5">
+            <!-- Código del Cupón -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Código del Cupón</label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  formControlName="code" 
+                  placeholder="Ej. VERANO2024"
+                  class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all uppercase"
+                  [class.border-red-500]="form.get('code')?.invalid && form.get('code')?.touched"
+                >
+                <button 
+                  type="button" 
+                  (click)="generateCode()" 
+                  [disabled]="isEditMode"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                >
+                  <mat-icon class="text-xl">casino</mat-icon>
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Código único que los usuarios ingresarán al registrarse</p>
+              <p *ngIf="form.get('code')?.hasError('required') && form.get('code')?.touched" class="text-xs text-red-600 mt-1">
+                El código es requerido
+              </p>
+            </div>
+
+            <!-- Nombre del Cupón -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Nombre interno para referencia</label>
+              <input 
+                type="text" 
+                formControlName="name" 
+                placeholder="Nombre descriptivo del cupón"
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                [class.border-red-500]="form.get('name')?.invalid && form.get('name')?.touched"
+              >
+              <p *ngIf="form.get('name')?.hasError('required') && form.get('name')?.touched" class="text-xs text-red-600 mt-1">
+                El nombre es requerido
+              </p>
+            </div>
+
+            <!-- Descripción -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Descripción</label>
+              <textarea 
+                formControlName="description" 
+                rows="3" 
+                placeholder="Descripción breve del descuento..."
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Configuración del Descuento -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <div class="flex items-center gap-2 mb-6">
+            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+            <h2 class="text-base font-semibold text-gray-800">Configuración del Descuento</h2>
+          </div>
+
+          <div class="space-y-5">
+            <!-- Tipo de Descuento -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Tipo de Descuento</label>
+              <select 
+                formControlName="discountType"
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+              >
+                <option value="percentage">Porcentaje (%)</option>
+                <option value="fixed_amount">Monto fijo (BOB)</option>
+              </select>
+            </div>
+
+            <!-- Valor del Descuento -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Valor</label>
+              <div class="relative">
+                <input 
+                  type="number" 
+                  formControlName="discountValue" 
+                  min="0" 
+                  step="0.01"
+                  placeholder="10"
+                  class="w-full px-3 py-2.5 pr-12 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                >
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+                  {{discountSymbol}}
+                </span>
+              </div>
+              <p *ngIf="form.get('discountType')?.value === 'percentage'" class="text-xs text-gray-500 mt-1">
+                Ingresa un porcentaje de descuento (Opcional)
+              </p>
+            </div>
+
+            <!-- Límite máximo de descuento porcentual (opcional) -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Límite máximo de descuento porcentual (Opcional)</label>
+              <div class="relative">
+                <input 
+                  type="number" 
+                  formControlName="maxDiscountAmount" 
+                  min="0" 
+                  step="1"
+                  placeholder="0.00"
+                  class="w-full px-3 py-2.5 pr-16 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                >
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">BOB</span>
+              </div>
+            </div>
+
+            <!-- Compra Mínima Requerida (opcional) -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Compra Mínima Requerida (Opcional)</label>
+              <div class="relative">
+                <input 
+                  type="number" 
+                  formControlName="minPurchaseAmount" 
+                  min="0" 
+                  step="1"
+                  placeholder="0.00"
+                  class="w-full px-3 py-2.5 pr-16 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                >
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">BOB</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUMNA DERECHA -->
+      <div class="space-y-6">
+        
+        <!-- Card: Aplicabilidad -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <div class="flex items-center gap-2 mb-6">
+            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+            <h2 class="text-base font-semibold text-gray-800">Aplicabilidad</h2>
+          </div>
+
+          <div class="space-y-5">
+            <!-- Aplica a -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Aplica a</label>
+              <select 
+                formControlName="appliesTo"
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+              >
+                <option value="all">Todos</option>
+                <option value="plans">Planes de suscripción</option>
+                <option value="extras">Extras</option>
+                <option value="ads">Publicidad</option>
+              </select>
+            </div>
+
+            <!-- Productos Específicos (condicional) -->
+            <div *ngIf="shouldShowPlanSelector()">
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-xs font-medium text-gray-700">
+                  Seleccionar {{ currentAppliesTo() === 'ads' ? 'planes de publicidad' : 'planes de suscripción' }} (Opcional)
+                </label>
+                <span *ngIf="getSelectedPlansCount() > 0" 
+                      class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                  {{getSelectedPlansCount()}} seleccionado(s)
+                </span>
+              </div>
+
+              <!-- Container con scroll para checkboxes -->
+              <div class="border border-gray-300 rounded-lg p-3 max-h-[240px] overflow-y-auto bg-white">
+                
+                <!-- Planes de publicidad -->
+                <ng-container *ngIf="currentAppliesTo() === 'ads'">
+                  <div *ngFor="let plan of availablePlans(); let i = index" 
+                       class="flex items-start py-2 hover:bg-gray-50 rounded px-2 transition-colors"
+                       [class.border-b]="i < availablePlans().length - 1"
+                       [class.border-gray-200]="i < availablePlans().length - 1">
+                    <mat-checkbox 
+                      [checked]="isPlanSelected(plan.id)"
+                      (change)="togglePlanSelection(plan.id)"
+                      color="primary"
+                      class="flex-shrink-0">
+                      <span class="text-sm text-gray-800">{{plan.name}}</span>
+                      <div class="text-xs text-gray-500 mt-0.5">
+                        {{plan.price}} BOB • {{plan.durationInDays}} días
+                      </div>
+                    </mat-checkbox>
+                  </div>
+                </ng-container>
+
+                <!-- Planes de suscripción -->
+                <ng-container *ngIf="currentAppliesTo() === 'plans'">
+                  <div *ngFor="let plan of availablePlans(); let planIndex = index" class="mb-3 last:mb-0">
+                    <!-- Header del plan -->
+                    <div class="text-xs font-semibold text-gray-700 mb-2 px-2 py-1 bg-gray-50 rounded">
+                      {{plan.name}}
+                    </div>
+                    
+                    <!-- Intervalos del plan -->
+                    <div *ngFor="let interval of plan.intervals; let i = index" 
+                         class="flex items-start py-2 hover:bg-gray-50 rounded px-2 ml-2 transition-colors"
+                         [class.border-b]="i < plan.intervals.length - 1"
+                         [class.border-gray-200]="i < plan.intervals.length - 1">
+                      <mat-checkbox 
+                        [checked]="isPlanSelected(interval.id)"
+                        (change)="togglePlanSelection(interval.id)"
+                        color="primary"
+                        class="flex-shrink-0">
+                        <span class="text-sm text-gray-800">{{interval.intervalDisplay}}</span>
+                        <div class="text-xs text-gray-500 mt-0.5">
+                          {{interval.pricePerPeriod}} {{interval.currency}} • {{interval.daysPerPeriod}} días
+                        </div>
+                      </mat-checkbox>
+                    </div>
+                  </div>
+                </ng-container>
+
+                <!-- Mensaje cuando está vacío -->
+                <div *ngIf="availablePlans().length === 0" class="text-center py-6 text-gray-500 text-sm">
+                  No hay planes disponibles
+                </div>
+              </div>
+
+              <p class="text-xs text-gray-500 mt-2">
+                <span class="font-medium">💡 Tip:</span> Si no seleccionas ninguno, el cupón aplicará a todos los {{ currentAppliesTo() === 'ads' ? 'planes de publicidad' : 'planes de suscripción' }}.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Límites de Uso -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <div class="flex items-center gap-2 mb-6">
+            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+            <h2 class="text-base font-semibold text-gray-800">Límites de Uso</h2>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Límite Total -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Límite Total</label>
+              <input 
+                type="number" 
+                formControlName="maxTotalUses" 
+                min="1" 
+                step="1"
+                placeholder="∞"
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              >
+            </div>
+
+            <!-- Por Usuario -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Por Usuario</label>
+              <input 
+                type="number" 
+                formControlName="maxUsesPerUser" 
+                min="1" 
+                step="1"
+                placeholder="∞"
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Vigencia -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <div class="flex items-center gap-2 mb-6">
+            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+            <h2 class="text-base font-semibold text-gray-800">Vigencia</h2>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Fecha Inicio -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Fecha Inicio</label>
+              <mat-form-field appearance="outline" class="w-full custom-datepicker">
+                <input 
+                  matInput 
+                  [matDatepicker]="pickerFrom" 
+                  formControlName="validFrom"
+                  placeholder="Selecciona fecha"
+                >
+                <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+                <mat-datepicker #pickerFrom></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <!-- Fecha Fin -->
+            <div>
+              <label class="text-xs font-medium text-gray-700 mb-1.5 block">Fecha Fin</label>
+              <mat-form-field appearance="outline" class="w-full custom-datepicker">
+                <input 
+                  matInput 
+                  [matDatepicker]="pickerUntil" 
+                  formControlName="validUntil"
+                  placeholder="Selecciona fecha"
+                >
+                <mat-datepicker-toggle matSuffix [for]="pickerUntil"></mat-datepicker-toggle>
+                <mat-datepicker #pickerUntil></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Actions Bar (Fijo abajo) -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-8 py-4 z-50">
+      <div class="max-w-7xl mx-auto flex justify-end gap-3">
+        <button 
+          type="button" 
+          (click)="cancel()" 
+          [disabled]="isSaving()"
+          class="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          Cancelar
+        </button>
+        
+        <button 
+          type="submit" 
+          [disabled]="isSaving() || form.invalid"
+          class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+        >
+          <mat-spinner diameter="16" *ngIf="isSaving()" class="inline-block"></mat-spinner>
+          <span>{{isSaving() ? 'Guardando...' : (isEditMode ? 'Actualizar Cupón' : 'Crear Cupón')}}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Espaciador para evitar que el contenido se oculte debajo de la barra fija -->
+    <div class="h-24"></div>
+  </form>
+</div>

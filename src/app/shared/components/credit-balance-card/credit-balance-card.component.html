@@ -1,0 +1,71 @@
+<mat-card [class.compact]="compact" class="credit-balance-card">
+  <mat-card-content>
+    <div *ngIf="balance" class="balance-content">
+      <!-- Header -->
+      <div class="balance-header">
+        <div class="header-icon">
+          <mat-icon class="text-purple-600">account_balance_wallet</mat-icon>
+        </div>
+        <div class="header-info">
+          <p class="balance-label">Balance de Créditos</p>
+          <p class="balance-amount">{{ formatCurrency(balance!.balance) }}</p>
+        </div>
+      </div>
+
+      <!-- Details (if showDetails is true) -->
+      <div *ngIf="showDetails && !compact" class="balance-details">
+        <mat-divider class="my-4"></mat-divider>
+        
+        <div class="details-grid">
+          <div class="detail-item">
+            <mat-icon class="detail-icon text-green-500">add_circle</mat-icon>
+            <div class="detail-info">
+              <span class="detail-label">Total Ganado</span>
+              <span class="detail-value">{{ formatCurrency(balance!.totalEarned) }}</span>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <mat-icon class="detail-icon text-blue-500">remove_circle</mat-icon>
+            <div class="detail-info">
+              <span class="detail-label">Total Gastado</span>
+              <span class="detail-value">{{ formatCurrency(balance!.totalSpent) }}</span>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <mat-icon class="detail-icon text-orange-500">access_time</mat-icon>
+            <div class="detail-info">
+              <span class="detail-label">Total Expirado</span>
+              <span class="detail-value">{{ formatCurrency(balance!.totalExpired) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="last-updated">
+          <mat-icon class="text-gray-400">update</mat-icon>
+          <span>Actualizado: {{ formatDate(balance!.lastUpdated) }}</span>
+        </div>
+      </div>
+
+      <!-- Compact version -->
+      <div *ngIf="compact" class="balance-compact">
+        <div class="compact-stat">
+          <span class="compact-label">Ganado</span>
+          <span class="compact-value text-green-600">+{{ formatCurrency(balance!.totalEarned) }}</span>
+        </div>
+        <div class="compact-stat">
+          <span class="compact-label">Gastado</span>
+          <span class="compact-value text-blue-600">-{{ formatCurrency(balance!.totalSpent) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!balance" class="empty-state">
+      <mat-icon class="empty-icon">account_balance_wallet</mat-icon>
+      <p>No hay información de créditos disponible</p>
+    </div>
+  </mat-card-content>
+</mat-card>
+

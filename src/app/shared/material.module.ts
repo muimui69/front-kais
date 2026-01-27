@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,10 +34,52 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatRippleModule } from '@angular/material/core';
+import { MatDividerModule } from '@angular/material/divider';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CreditBalanceCardComponent } from './components/credit-balance-card/credit-balance-card.component';
 
 @NgModule({
+  imports: [
+    CommonModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatCardModule,
+    MatChipsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatGridListModule,
+    MatIconModule,
+    MatInputModule,
+    MatListModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatSidenavModule,
+    MatSnackBarModule,
+    MatToolbarModule,
+    MatButtonToggleModule,
+    MatTableModule,
+    MatMenuModule,
+    MatProgressBarModule,
+    MatSortModule,
+    MatPaginatorModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatBadgeModule,
+    MatExpansionModule,
+    MatTabsModule,
+    MatCheckboxModule,
+    MatRadioModule,
+    MatStepperModule,
+    ScrollingModule,
+    MatSlideToggleModule,
+    MatTooltipModule,
+    FormsModule,
+    MatSliderModule,
+    MatRippleModule,
+    MatDividerModule,
+    ReactiveFormsModule
+  ],
   exports: [
     MatAutocompleteModule,
     MatButtonModule,
@@ -73,7 +116,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     FormsModule,
     MatSliderModule,
     MatRippleModule,
-    ReactiveFormsModule
+    MatDividerModule,
+    ReactiveFormsModule,
+    CreditBalanceCardComponent
+  ],
+  declarations: [
+    CreditBalanceCardComponent
   ]
 })
 export class MaterialModule { }

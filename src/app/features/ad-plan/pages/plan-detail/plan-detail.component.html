@@ -1,0 +1,60 @@
+<div class="min-h-screen bg-gray-50 pb-20 pt-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto">
+
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-2">
+        <button mat-icon-button routerLink="/ad-plans" class="text-gray-500">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1 class="text-2xl font-bold text-gray-900 m-0">Detalles del Plan</h1>
+      </div>
+      <button *ngIf="plan" mat-stroked-button color="primary" [routerLink]="['/ad-plans/edit', plan.id]">
+        <mat-icon class="mr-2">edit</mat-icon> Editar
+      </button>
+    </div>
+
+    <div *ngIf="isLoading" class="flex justify-center p-12">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="!isLoading && plan" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+      <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">{{ plan.name }}</h2>
+          <span class="text-xs font-mono text-gray-400">ID: {{ plan.id }}</span>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs font-bold border"
+              [ngClass]="plan.isActive ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200'">
+          {{ plan.isActive ? 'ACTIVO' : 'INACTIVO' }}
+        </span>
+      </div>
+
+      <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <div class="text-center p-6 bg-blue-50 rounded-xl border border-blue-100">
+          <p class="text-sm text-blue-600 font-bold uppercase mb-1">Precio</p>
+          <p class="text-4xl font-extrabold text-blue-900">{{ plan.price  }}</p>
+        </div>
+
+        <div class="text-center p-6 bg-purple-50 rounded-xl border border-purple-100">
+          <p class="text-sm text-purple-600 font-bold uppercase mb-1">Duración</p>
+          <p class="text-4xl font-extrabold text-purple-900">{{ plan.durationInDays }} <span class="text-lg">días</span></p>
+        </div>
+
+        <div class="col-span-2 border-t border-gray-100 pt-6">
+          <h3 class="text-sm font-bold text-gray-500 uppercase mb-4">Métricas</h3>
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-gray-400">equalizer</mat-icon>
+            <p class="text-gray-700">
+              Suscripciones históricas:
+              <span class="font-bold text-gray-900">{{ plan.subscriptionsCount || 0 }}</span>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

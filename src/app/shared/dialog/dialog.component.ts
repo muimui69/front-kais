@@ -1,9 +1,12 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, Injectable } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MaterialModule } from '../material.module';
 
+@Injectable({
+  providedIn: 'root'
+})
 @Component({
   selector: 'app-dialog',
   templateUrl: './dialog.component.html',

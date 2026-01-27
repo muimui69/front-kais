@@ -1,0 +1,207 @@
+<div class="dashboard-container">
+
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Dashboard de Referidos</h1>
+      <p class="subtitle">Visión general del rendimiento del programa</p>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="goToConfig()">
+        <mat-icon>settings</mat-icon> Configuración
+      </button>
+      <button mat-stroked-button (click)="goToHistory()">
+        <mat-icon>history</mat-icon> Historial
+      </button>
+      <button mat-raised-button color="primary" (click)="goToLeaderboard()">
+        <mat-icon>emoji_events</mat-icon> Leaderboard
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-grid" *ngIf="!loadingStats()">
+
+    <mat-card class="stat-card blue-accent">
+      <mat-card-content>
+        <div class="stat-info">
+          <h3>Total Referidos</h3>
+          <p class="stat-value">{{ stats()?.totalReferrals || 0 }}</p>
+        </div>
+        <div class="stat-icon total">
+          <mat-icon>group</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card green-accent">
+      <mat-card-content>
+        <div class="stat-info">
+          <h3>Completados</h3>
+          <p class="stat-value">{{ stats()?.totalCompletedReferrals || 0 }}</p>
+        </div>
+        <div class="stat-icon completed">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card orange-accent">
+      <mat-card-content>
+        <div class="stat-info">
+          <h3>Pendientes</h3>
+          <p class="stat-value">{{ (stats()?.totalReferrals || 0) - (stats()?.totalCompletedReferrals || 0) }}</p>
+        </div>
+        <div class="stat-icon pending">
+          <mat-icon>hourglass_top</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card purple-accent">
+      <mat-card-content>
+        <div class="stat-info">
+          <h3>Recompensas</h3>
+          <p class="stat-value">Bs {{ stats()?.totalRewardsGiven || 0 }}</p>
+        </div>
+        <div class="stat-icon rewards">
+          <mat-icon>payments</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div *ngIf="loadingStats()" class="stats-loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field subscript-wrapper-off">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput [formControl]="searchControl" placeholder="Buscar por código, nombre o email...">
+          <button mat-icon-button matSuffix *ngIf="searchControl.value" (click)="searchControl.setValue('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field subscript-wrapper-off">
+          <mat-label>Filtrar por Estado</mat-label>
+          <mat-select [formControl]="statusFilter">
+            <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-icon-button (click)="clearFilters()" matTooltip="Limpiar filtros">
+          <mat-icon>filter_alt_off</mat-icon>
+        </button>
+
+        <button mat-icon-button (click)="refreshData()" matTooltip="Actualizar datos">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="table-card">
+
+    <div *ngIf="loading()" class="table-loading">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div *ngIf="!loading()" class="table-container">
+      <table mat-table [dataSource]="dataSource" matSort class="referrals-table">
+
+        <ng-container matColumnDef="code">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th>
+          <td mat-cell *matCellDef="let row">
+            <span style="font-weight: 600; color: #5e72e4;">{{ row.referralCode?.code }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="referrerName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Referidor</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="user-info">
+              <div class="avatar-circle">
+                {{ getInitials(row.referrerName) }}
+              </div>
+              <div>
+                <p class="user-name">{{ row.referrerName }}</p>
+                <p class="user-email">{{ row.referrerEmail }}</p>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="referredName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Referido</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="user-info">
+              <div class="avatar-circle" style="background-color: #fff0f3; color: #f5365c;">
+                {{ getInitials(row.referredName) }}
+              </div>
+              <div>
+                <p class="user-name">{{ row.referredName }}</p>
+                <p class="user-email">{{ row.referredEmail }}</p>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="status-badge" [ngClass]="'status-' + row.status">
+              <span class="status-dot"></span>
+              {{ getStatusLabel(row.status) }}
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha Registro</th>
+          <td mat-cell *matCellDef="let row"> {{ formatDate(row.createdAt) }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="completedAt">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Completado</th>
+          <td mat-cell *matCellDef="let row"> {{ row.completedAt ? formatDate(row.completedAt) : '-' }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="rewardAmount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Recompensa</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="reward-amount">{{ formatReward(row) }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row" style="text-align: right;">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon style="color: #adb5bd;">more_horiz</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="markAsCompleted(row)" [disabled]="!canMarkAsCompleted(row)">
+                <mat-icon>check_circle</mat-icon> Marcar Completado
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="8" style="text-align: center; padding: 40px;">
+             No se encontraron datos
+          </td>
+        </tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator>
+    </div>
+  </mat-card>
+</div>

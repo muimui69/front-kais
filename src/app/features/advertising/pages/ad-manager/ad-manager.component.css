@@ -1,0 +1,31 @@
+/* Animación de entrada para el Grid */
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Override suave para el botón Back de Material */
+button[mat-icon-button] {
+  width: 40px !important;
+  height: 40px !important;
+  line-height: 40px !important;
+  border-radius: 12px !important; /* Más cuadrado/redondo estilo iOS */
+}
+
+/* Estilos específicos para los iconos dentro de los botones flotantes */
+button[mat-icon-button] mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+}

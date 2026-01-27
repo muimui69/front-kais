@@ -1,0 +1,62 @@
+<div class="coupon-input-container">
+  <mat-form-field class="w-full" appearance="outline">
+    <mat-label>Código de cupón</mat-label>
+    <input 
+      matInput 
+      [ngModel]="code()"
+      (ngModelChange)="onCodeChange($event)"
+      [disabled]="disabled"
+      placeholder="Ej: PLAN10, BIENVENIDO20"
+      maxlength="50"
+      class="uppercase"
+    />
+    
+    <!-- Spinner mientras valida -->
+    <mat-icon matSuffix *ngIf="validating()">
+      <mat-spinner diameter="20"></mat-spinner>
+    </mat-icon>
+    
+    <!-- Ícono de éxito -->
+    <mat-icon 
+      matSuffix 
+      *ngIf="isValid() && !validating()" 
+      class="text-green-600"
+    >
+      check_circle
+    </mat-icon>
+    
+    <!-- Ícono de error -->
+    <mat-icon 
+      matSuffix 
+      *ngIf="!isValid() && !validating() && code() && code().length >= 3" 
+      class="text-red-600"
+    >
+      error
+    </mat-icon>
+    
+    <!-- Botón para limpiar -->
+    <button 
+      mat-icon-button 
+      matSuffix 
+      *ngIf="code() && !validating()"
+      (click)="clear()"
+      type="button"
+      matTooltip="Limpiar cupón"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+    
+    <!-- Mensaje de éxito con descuento -->
+    <mat-hint *ngIf="isValid() && discountAmount()">
+      <span class="text-green-600 font-semibold">
+        ✓ Descuento: {{discountAmount()}} BOB
+        (Total: {{finalAmount()}} BOB)
+      </span>
+    </mat-hint>
+    
+    <!-- Mensaje de error -->
+    <mat-error *ngIf="!isValid() && errorMessage()">
+      {{errorMessage()}}
+    </mat-error>
+  </mat-form-field>
+</div>
