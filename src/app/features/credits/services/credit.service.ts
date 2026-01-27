@@ -11,13 +11,14 @@ import {
   CreditTransactionFilters,
   ApiResponse
 } from '../interfaces/credit.interface';
+import { environment } from '../../../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CreditService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/credits';
+  private apiUrl = `${environment.baseUrl}/credits`;
 
   /**
    * Obtener balance de créditos de un usuario
@@ -88,7 +89,7 @@ export class CreditService {
    */
   getAllTransactions(filters?: CreditTransactionFilters): Observable<ApiResponse<CreditTransaction[]>> {
     let url = `${this.apiUrl}/transactions`;
-    
+
     if (filters) {
       const params = new URLSearchParams();
       if (filters.userId) params.append('userId', filters.userId.toString());
@@ -98,7 +99,7 @@ export class CreditService {
       if (filters.endDate) params.append('endDate', filters.endDate);
       if (filters.minAmount) params.append('minAmount', filters.minAmount.toString());
       if (filters.maxAmount) params.append('maxAmount', filters.maxAmount.toString());
-      
+
       const queryString = params.toString();
       if (queryString) url += `?${queryString}`;
     }

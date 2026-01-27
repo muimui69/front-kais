@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CouponService } from '../../services/coupon.service';
 import { AdPlanService } from '../../../ad-plan/services/ad-plan.service';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environment/environment';
 
 @Component({
   selector: 'app-coupon-form',
@@ -49,17 +50,17 @@ export class CouponFormComponent implements OnInit {
   // Datos para selects
   availableAdPlans = signal<any[]>([]);
   availableSubscriptionPlans = signal<any[]>([]);
-  
+
   // Computed para obtener los planes según appliesTo
   availablePlans = computed(() => {
     const appliesTo = this.currentAppliesTo();
-    
+
     if (appliesTo === 'ads') {
       return this.availableAdPlans();
     } else if (appliesTo === 'plans') {
       return this.availableSubscriptionPlans();
     }
-    
+
     return [];
   });
 
@@ -77,7 +78,7 @@ export class CouponFormComponent implements OnInit {
     });
 
     this.loadPlans();
-    
+
     // Verificar si es edición
     this.route.params.subscribe(params => {
       if (params['id']) {
@@ -108,8 +109,9 @@ export class CouponFormComponent implements OnInit {
       }
     });
 
+
     // Cargar planes de suscripción
-    this.http.get<any>('http://localhost:3000/api/plans').subscribe({
+    this.http.get<any>(`${environment.baseUrl}/plans`).subscribe({
       next: (res) => {
         if (res.success) {
           this.availableSubscriptionPlans.set(res.data);
@@ -126,25 +128,25 @@ export class CouponFormComponent implements OnInit {
    */
   loadCoupon(id: number) {
     this.isLoading.set(true);
-    
+
     this.couponService.getById(id).subscribe({
       next: (res) => {
         if (res.success) {
           const coupon = res.data;
-          
+
           // Convertir fechas a formato YYYY-MM-DD para inputs HTML5
           const validFrom = coupon.validFrom ? this.formatDateForInput(new Date(coupon.validFrom)) : this.formatDateForInput(new Date());
           const validUntil = coupon.validUntil ? this.formatDateForInput(new Date(coupon.validUntil)) : this.formatDateForInput(this.getDefaultEndDate());
-          
+
           this.form.patchValue({
             ...coupon,
             validFrom,
             validUntil
           });
-          
+
           // Actualizar el signal de appliesTo
           this.currentAppliesTo.set(coupon.appliesTo || 'plans');
-          
+
           // Deshabilitar el código en modo edición
           this.form.get('code')?.disable();
         }
@@ -166,13 +168,13 @@ export class CouponFormComponent implements OnInit {
     // Validar discount value según el tipo
     this.form.get('discountType')?.valueChanges.subscribe(type => {
       const valueControl = this.form.get('discountValue');
-      
+
       if (type === 'percentage') {
         valueControl?.setValidators([Validators.required, Validators.min(0.01), Validators.max(100)]);
       } else {
         valueControl?.setValidators([Validators.required, Validators.min(0.01)]);
       }
-      
+
       valueControl?.updateValueAndValidity();
     });
 
@@ -225,7 +227,7 @@ export class CouponFormComponent implements OnInit {
 
     // Preparar datos
     const formValue = this.form.getRawValue(); // getRawValue incluye campos deshabilitados
-    
+
     // Debug: Verificar los IDs seleccionados
     console.log('🎯 Valores del formulario:', {
       appliesTo: formValue.appliesTo,
@@ -234,7 +236,7 @@ export class CouponFormComponent implements OnInit {
       esArray: Array.isArray(formValue.specificPlanIds),
       cantidad: formValue.specificPlanIds?.length
     });
-    
+
     // Convertir fechas a ISO string
     const data = {
       code: formValue.code,
@@ -351,7 +353,7 @@ export class CouponFormComponent implements OnInit {
   togglePlanSelection(planId: number): void {
     const control = this.form.get('specificPlanIds');
     const currentValue = control?.value || [];
-    
+
     if (this.isPlanSelected(planId)) {
       // Remover del array
       control?.setValue(currentValue.filter((id: number) => id !== planId));
