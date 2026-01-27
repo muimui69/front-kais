@@ -157,11 +157,11 @@ export const menuItem = [
         icon: 'local_offer',
         router: '/coupons',
       },
-      {
+     /* {
         name: 'Referidos',
         icon: 'people',
         router: '/referrals',
-      }
+      }*/
 
     ]
   },
