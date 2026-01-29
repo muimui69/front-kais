@@ -86,10 +86,12 @@ export class CreditsDashboardComponent implements OnInit {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('es-ES', {
+    const formatted = new Intl.NumberFormat('es-ES', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'BOB'
     }).format(amount);
+    // Reemplazar "BOB" por "Bs" para usar el símbolo local
+    return formatted.replace('BOB', 'Bs');
   }
 
   formatDate(date: string): string {
