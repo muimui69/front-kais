@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environment/environment';
-import { CreateUserDto, ListUsersParams, PaginatedUsers, User } from '../interfaces/user.interface';
+import { CreateUserDto, ListUsersParams, PaginatedUsers, searchBackUsersResponse, User } from '../interfaces/user.interface';
 
 
 
@@ -11,6 +11,7 @@ import { CreateUserDto, ListUsersParams, PaginatedUsers, User } from '../interfa
 })
 export class UserService {
     private baseUrl: string = `${environment.baseUrl}/users`;
+    private adminBaseUrl: string = `${environment.baseUrl}/administrators`;
 
     constructor(private http: HttpClient) { }
 
@@ -38,5 +39,12 @@ export class UserService {
         return this.http.post<User>(this.baseUrl, userData, {
             withCredentials: true
         });
+    }
+
+    searchUsers(term: string): Observable<searchBackUsersResponse> {
+        return this.http.post<searchBackUsersResponse>(`${this.adminBaseUrl}/search-user`,
+            { term },
+            { withCredentials: true }
+        );
     }
 }

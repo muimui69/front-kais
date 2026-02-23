@@ -47,6 +47,10 @@ const routes: Routes = [
     loadChildren: () => import('../app/features/referrals/referrals.module').then(m => m.ReferralsModule),
   },
   {
+    path: 'credits',
+    loadChildren: () => import('../app/features/credits/credits.module').then(m => m.CreditsModule),
+  },
+  {
     path: '**',
     redirectTo: 'auth'
   }

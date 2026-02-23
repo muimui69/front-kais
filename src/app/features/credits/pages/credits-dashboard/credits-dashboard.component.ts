@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CreditService } from '../../services/credit.service';
-import { GlobalCreditStats, CreditTransaction } from '../../interfaces/credit.interface';
+import { CreditStats } from '../../interfaces/credit-stats.interface';
 
 @Component({
   selector: 'app-credits-dashboard',
@@ -15,41 +15,32 @@ export class CreditsDashboardComponent implements OnInit {
 
   // State signals
   loading = signal<boolean>(true);
-  stats = signal<GlobalCreditStats | null>(null);
-  recentTransactions = signal<CreditTransaction[]>([]);
+  stats = signal<CreditStats | null>(null);
+  error = signal<string | null>(null);
 
-  // Table columns
-  displayedColumns: string[] = ['createdAt', 'userName', 'type', 'amount', 'reason', 'balanceAfter'];
+  // Table columns for recent transactions
+  displayedColumns: string[] = ['createdAt', 'userName', 'type', 'amount', 'source', 'description', 'balanceAfter'];
 
   ngOnInit(): void {
     this.loadDashboardData();
   }
 
-  private loadDashboardData(): void {
+  loadDashboardData(): void {
     this.loading.set(true);
+    this.error.set(null);
 
-    // Load global stats
-    this.creditService.getGlobalStats().subscribe({
+    this.creditService.getCreditStats().subscribe({
       next: (response) => {
         if (response.success && response.data) {
           this.stats.set(response.data);
-        }
-      },
-      error: (error) => {
-        console.error('Error loading global stats:', error);
-      }
-    });
-
-    // Load recent transactions (last 10)
-    this.creditService.getAllTransactions().subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.recentTransactions.set(response.data.slice(0, 10));
+        } else {
+          this.error.set(response.message || 'Error al cargar estadísticas');
         }
         this.loading.set(false);
       },
-      error: (error) => {
-        console.error('Error loading transactions:', error);
+      error: (err) => {
+        console.error('Error loading credit stats:', err);
+        this.error.set('Error al conectar con el servidor');
         this.loading.set(false);
       }
     });
@@ -60,42 +51,24 @@ export class CreditsDashboardComponent implements OnInit {
     this.router.navigate(['/credits/grant']);
   }
 
-  navigateToTransactions(): void {
-    this.router.navigate(['/credits/transactions']);
+  navigateToExpirations(): void {
+    this.router.navigate(['/credits/expirations']);
+  }
+
+  navigateToAudit(): void {
+    this.router.navigate(['/credits/audit']);
   }
 
   // Utility methods
-  getTypeLabel(type: string): string {
-    const labels: { [key: string]: string } = {
-      'grant': 'Otorgado',
-      'usage': 'Usado',
-      'refund': 'Reembolso',
-      'expiration': 'Expirado'
-    };
-    return labels[type] || type;
-  }
-
-  getTypeColor(type: string): string {
-    const colors: { [key: string]: string } = {
-      'grant': 'green',
-      'usage': 'blue',
-      'refund': 'orange',
-      'expiration': 'red'
-    };
-    return colors[type] || 'gray';
-  }
-
   formatCurrency(amount: number): string {
-    const formatted = new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'BOB'
+    return new Intl.NumberFormat('es-BO', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(amount);
-    // Reemplazar "BOB" por "Bs" para usar el símbolo local
-    return formatted.replace('BOB', 'Bs');
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('es-ES', {
+    return new Date(date).toLocaleDateString('es-BO', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -104,21 +77,13 @@ export class CreditsDashboardComponent implements OnInit {
     });
   }
 
-  // Process expired credits
-  processExpiredCredits(): void {
-    if (confirm('¿Estás seguro de que deseas procesar los créditos expirados?')) {
-      this.creditService.processExpiredCredits().subscribe({
-        next: (response) => {
-          if (response.success) {
-            alert(`Se procesaron ${response.data?.expiredCount} créditos expirados por un total de ${this.formatCurrency(response.data?.totalAmount || 0)}`);
-            this.loadDashboardData();
-          }
-        },
-        error: (error) => {
-          console.error('Error processing expired credits:', error);
-          alert('Error al procesar créditos expirados');
-        }
-      });
-    }
+  getCurrentMonth(): string {
+    return new Date().toLocaleDateString('es-BO', { month: 'long', year: 'numeric' });
+  }
+
+  hasUpcomingExpirations(): boolean {
+    const expiringAmount = this.stats()?.creditsExpiringIn30Days || 0;
+    return expiringAmount > 0;
   }
 }
+

@@ -157,7 +157,12 @@ export const menuItem = [
         icon: 'local_offer',
         router: '/coupons',
       },
-     /* {
+      /*{
+        name: 'Créditos',
+        icon: 'account_balance_wallet',
+        router: '/credits',
+      }
+      {
         name: 'Referidos',
         icon: 'people',
         router: '/referrals',

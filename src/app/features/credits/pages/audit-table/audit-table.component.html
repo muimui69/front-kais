@@ -1,0 +1,332 @@
+<div class="audit-table-container p-6">
+  <!-- Header -->
+  <div class="header-section mb-6">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <button mat-icon-button (click)="goBack()" matTooltip="Volver al dashboard">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <h1 class="text-3xl font-bold">Auditoría de Transacciones</h1>
+          <p class="text-gray-600">Historial completo de todas las transacciones de créditos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Alert -->
+  <mat-card *ngIf="error()" class="bg-red-50 border-l-4 border-red-500 mb-6">
+    <mat-card-content>
+      <div class="flex items-start gap-3">
+        <mat-icon class="text-red-500 mt-1">error</mat-icon>
+        <div class="flex-1">
+          <p class="font-semibold text-red-700">Error al Cargar Datos</p>
+          <p class="text-red-600">{{ error() }}</p>
+        </div>
+        <button mat-stroked-button color="warn" (click)="loadTransactions(1)" class="ml-auto">
+          <mat-icon>refresh</mat-icon>
+          Reintentar
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Filters Card -->
+  <mat-card class="mb-6">
+    <mat-card-header>
+      <mat-card-title class="flex items-center gap-2">
+        <mat-icon>filter_list</mat-icon>
+        Filtros de Búsqueda
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        
+        <!-- Type Filter -->
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de Transacción</mat-label>
+          <mat-select formControlName="type" (selectionChange)="onFilterChange()">
+            <mat-option *ngFor="let option of typeOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Source Filter -->
+        <mat-form-field appearance="outline">
+          <mat-label>Fuente</mat-label>
+          <mat-select formControlName="source" (selectionChange)="onFilterChange()">
+            <mat-option *ngFor="let option of sourceOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- User ID Filter -->
+        <mat-form-field appearance="outline">
+          <mat-label>ID de Usuario</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="userIdFilter"
+            placeholder="Ej: 123"
+            (input)="onFilterChange()"
+          />
+          <mat-icon matPrefix>person</mat-icon>
+        </mat-form-field>
+
+        <!-- Start Date -->
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha Inicio</mat-label>
+          <input
+            matInput
+            type="date"
+            formControlName="startDate"
+            (change)="onFilterChange()"
+          />
+          <mat-icon matPrefix>event</mat-icon>
+        </mat-form-field>
+
+        <!-- End Date -->
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha Fin</mat-label>
+          <input
+            matInput
+            type="date"
+            formControlName="endDate"
+            (change)="onFilterChange()"
+          />
+          <mat-icon matPrefix>event</mat-icon>
+        </mat-form-field>
+
+        <!-- Clear Filters Button -->
+        <div class="flex items-center">
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="clearFilters()"
+            class="w-full"
+          >
+            <mat-icon>clear</mat-icon>
+            Limpiar Filtros
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Stats Bar -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <mat-card>
+      <mat-card-content class="flex items-center gap-4">
+        <mat-icon class="text-blue-500 text-3xl">receipt_long</mat-icon>
+        <div>
+          <p class="text-gray-600 text-sm">Total Transacciones</p>
+          <p class="text-2xl font-bold">{{ totalItems() }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-content class="flex items-center gap-4">
+        <mat-icon class="text-green-500 text-3xl">description</mat-icon>
+        <div>
+          <p class="text-gray-600 text-sm">Página Actual</p>
+          <p class="text-2xl font-bold">{{ currentPage() }} de {{ totalPages() }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-content class="flex items-center gap-4">
+        <mat-icon class="text-purple-500 text-3xl">filter_alt</mat-icon>
+        <div>
+          <p class="text-gray-600 text-sm">Registros por Página</p>
+          <p class="text-2xl font-bold">{{ pageSize() }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="flex justify-center items-center py-16">
+    <mat-spinner diameter="64"></mat-spinner>
+  </div>
+
+  <!-- Transactions Table -->
+  <mat-card *ngIf="!loading()">
+    <mat-card-header>
+      <mat-card-title class="flex items-center gap-2">
+        <mat-icon>history</mat-icon>
+        Historial de Transacciones
+      </mat-card-title>
+      <mat-card-subtitle>
+        Mostrando {{ transactions().length }} de {{ totalItems() }} transacciones
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="overflow-x-auto mt-4">
+        <table mat-table [dataSource]="transactions()" class="w-full">
+          
+          <!-- Created At Column -->
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">Fecha</th>
+            <td mat-cell *matCellDef="let transaction">
+              {{ formatDate(transaction.createdAt) }}
+            </td>
+          </ng-container>
+
+          <!-- User ID Column -->
+          <ng-container matColumnDef="userId">
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">ID Usuario</th>
+            <td mat-cell *matCellDef="let transaction">
+              <button
+                mat-button
+                color="primary"
+                (click)="viewUserDetail(transaction.userId)"
+                class="font-mono text-sm"
+              >
+                #{{ transaction.userId }}
+              </button>
+            </td>
+          </ng-container>
+
+          <!-- User Name Column -->
+          <ng-container matColumnDef="userName">
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">Usuario</th>
+            <td mat-cell *matCellDef="let transaction">
+              <div class="flex flex-col">
+                <span class="font-medium">{{ transaction.userName }}</span>
+                <span class="text-xs text-gray-500">{{ transaction.userEmail }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">Tipo</th>
+            <td mat-cell *matCellDef="let transaction">
+              <mat-chip [ngClass]="{
+                'bg-green-100 text-green-800': transaction.type === 'earned',
+                'bg-blue-100 text-blue-800': transaction.type === 'used',
+                'bg-red-100 text-red-800': transaction.type === 'expired',
+                'bg-orange-100 text-orange-800': transaction.type === 'refunded'
+              }">
+                {{ transaction.type | creditType }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Amount Column -->
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef class="font-semibold text-right">Monto</th>
+            <td mat-cell *matCellDef="let transaction" class="text-right">
+              <span [ngClass]="{
+                'text-green-600 font-semibold': transaction.type === 'earned' || transaction.type === 'refunded',
+                'text-red-600 font-semibold': transaction.type === 'used' || transaction.type === 'expired'
+              }">
+                {{ transaction.type === 'earned' || transaction.type === 'refunded' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }} Bs
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Source Column -->
+          <ng-container matColumnDef="source">
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">Fuente</th>
+            <td mat-cell *matCellDef="let transaction">
+              <span class="text-sm">{{ transaction.source | creditSource }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">Descripción</th>
+            <td mat-cell *matCellDef="let transaction" class="max-w-xs">
+              <span class="text-sm truncate block" [title]="transaction.description">
+                {{ transaction.description || '-' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Balance After Column -->
+          <ng-container matColumnDef="balanceAfter">
+            <th mat-header-cell *matHeaderCellDef class="font-semibold text-right">Balance Después</th>
+            <td mat-cell *matCellDef="let transaction" class="text-right font-medium">
+              {{ formatCurrency(transaction.balanceAfter) }} Bs
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
+
+          <!-- No Data Row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell text-center py-8 text-gray-500" [attr.colspan]="displayedColumns.length">
+              <mat-icon class="text-gray-400 text-5xl">search_off</mat-icon>
+              <p class="text-lg mt-2">No se encontraron transacciones</p>
+              <p class="text-sm">Intenta ajustar los filtros de búsqueda</p>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex justify-between items-center mt-6 pt-4 border-t" *ngIf="transactions().length > 0">
+        <div class="text-sm text-gray-600">
+          Página {{ currentPage() }} de {{ totalPages() }} ({{ totalItems() }} total)
+        </div>
+        <div class="flex gap-2">
+          <button
+            mat-stroked-button
+            [disabled]="currentPage() === 1"
+            (click)="onPageChange(1)"
+          >
+            <mat-icon>first_page</mat-icon>
+          </button>
+          <button
+            mat-stroked-button
+            [disabled]="currentPage() === 1"
+            (click)="onPageChange(currentPage() - 1)"
+          >
+            <mat-icon>chevron_left</mat-icon>
+            Anterior
+          </button>
+          <button
+            mat-stroked-button
+            [disabled]="currentPage() === totalPages()"
+            (click)="onPageChange(currentPage() + 1)"
+          >
+            Siguiente
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+          <button
+            mat-stroked-button
+            [disabled]="currentPage() === totalPages()"
+            (click)="onPageChange(totalPages())"
+          >
+            <mat-icon>last_page</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Info Card -->
+  <mat-card class="mt-6">
+    <mat-card-content>
+      <div class="flex items-start gap-3">
+        <mat-icon class="text-blue-500">info</mat-icon>
+        <div class="text-sm text-gray-700">
+          <p class="font-semibold mb-2">Información sobre la Auditoría:</p>
+          <ul class="list-disc list-inside space-y-1 text-gray-600">
+            <li>Esta tabla muestra todas las transacciones del sistema en orden cronológico</li>
+            <li>Usa los filtros para refinar tu búsqueda por tipo, fuente, usuario o fecha</li>
+            <li>Haz clic en el ID del usuario para ver su perfil de créditos completo</li>
+            <li>Las transacciones están paginadas para un mejor rendimiento (50 por página)</li>
+            <li>El historial se mantiene permanentemente para propósitos de auditoría</li>
+          </ul>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

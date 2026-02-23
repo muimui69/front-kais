@@ -1,248 +1,284 @@
 <div class="credits-dashboard-container p-6">
-  <!-- Loading State -->
-  <div *ngIf="loading()" class="loading-container">
-    <mat-spinner diameter="50" class="loading-spinner"></mat-spinner>
-    <p>Cargando dashboard...</p>
-  </div>
-
-  <!-- Content -->
-  <div *ngIf="!loading()">
-    <!-- Header -->
-    <div class="header-section mb-6">
-      <div class="flex justify-between items-center">
-        <div>
-          <h1 class="page-title">Dashboard de Créditos</h1>
-          <p class="page-subtitle">Gestión y estadísticas del sistema de créditos</p>
-        </div>
-        <div class="flex gap-3">
-          <button mat-raised-button color="primary" (click)="navigateToGrant()">
-            <mat-icon>add</mat-icon>
-            Otorgar Créditos
-          </button>
-          <button mat-stroked-button (click)="processExpiredCredits()">
-            <mat-icon>schedule</mat-icon>
-            Procesar Expirados
-          </button>
-        </div>
+  <!-- Header -->
+  <div class="header-section mb-6">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold">Dashboard de Créditos</h1>
+        <p class="text-gray-600">Gestión y estadísticas del sistema de créditos</p>
+      </div>
+      <!-- Quick Action Buttons -->
+      <div class="flex gap-3" *ngIf="!loading() && stats()">
+        <button mat-raised-button color="primary" (click)="navigateToGrant()">
+          <mat-icon>add_circle</mat-icon>
+          Otorgar Créditos
+        </button>
+        <button mat-stroked-button (click)="navigateToExpirations()">
+          <mat-icon>schedule</mat-icon>
+          Expiraciones
+        </button>
+        <button mat-stroked-button (click)="navigateToAudit()">
+          <mat-icon>fact_check</mat-icon>
+          Auditoría
+        </button>
       </div>
     </div>
+  </div>
 
-    <!-- Stats Cards Grid -->
-    <div class="stats-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" *ngIf="stats()">
-      <!-- Total Credits Granted -->
-      <mat-card class="stat-card">
-        <mat-card-content class="stat-content">
-          <mat-icon class="stat-icon text-green-500">add_circle</mat-icon>
-          <div class="stat-details">
-            <p class="stat-label">Créditos Otorgados</p>
-            <p class="stat-value">{{ formatCurrency(stats()?.totalCreditsGranted || 0) }}</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="flex justify-center items-center py-16">
+    <mat-spinner diameter="64"></mat-spinner>
+  </div>
 
-      <!-- Total Credits Used -->
-      <mat-card class="stat-card">
-        <mat-card-content class="stat-content">
-          <mat-icon class="stat-icon text-blue-500">shopping_cart</mat-icon>
-          <div class="stat-details">
-            <p class="stat-label">Créditos Usados</p>
-            <p class="stat-value">{{ formatCurrency(stats()?.totalCreditsUsed || 0) }}</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
+  <!-- Error State -->
+  <mat-card *ngIf="!loading() && error()" class="bg-red-50 border-l-4 border-red-500">
+    <mat-card-content>
+      <div class="flex items-center gap-3">
+        <mat-icon class="text-red-500">error</mat-icon>
+        <div>
+          <p class="font-semibold text-red-700">Error al cargar datos</p>
+          <p class="text-red-600">{{ error() }}</p>
+        </div>
+        <button mat-stroked-button color="warn" (click)="loadDashboardData()" class="ml-auto">
+          <mat-icon>refresh</mat-icon>
+          Reintentar
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
-      <!-- Active Balance -->
-      <mat-card class="stat-card">
-        <mat-card-content class="stat-content">
-          <mat-icon class="stat-icon text-purple-500">account_balance_wallet</mat-icon>
-          <div class="stat-details">
-            <p class="stat-label">Balance Activo</p>
-            <p class="stat-value">{{ formatCurrency(stats()?.activeBalance || 0) }}</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
+  <!-- Main Content -->
+  <div *ngIf="!loading() && stats()" class="space-y-6">
+    
+    <!-- KPI Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Total Créditos Activos -->
+      <app-kpi-card 
+        [title]="'Total Créditos Activos'"
+        [value]="formatCurrency(stats()?.totalActiveCredits || 0) + ' Bs'"
+        [icon]="'account_balance_wallet'"
+        [color]="'green'"
+        [subtitle]="'Suma de todos los balances'">
+      </app-kpi-card>
 
-      <!-- Users with Credits -->
-      <mat-card class="stat-card">
-        <mat-card-content class="stat-content">
-          <mat-icon class="stat-icon text-orange-500">people</mat-icon>
-          <div class="stat-details">
-            <p class="stat-label">Usuarios con Créditos</p>
-            <p class="stat-value">{{ stats()?.usersWithCredits || 0 }}</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
+      <!-- Total Usuarios con Créditos -->
+      <app-kpi-card 
+        [title]="'Usuarios con Créditos'"
+        [value]="(stats()?.totalUsersWithCredits || 0).toString()"
+        [icon]="'people'"
+        [color]="'blue'"
+        [subtitle]="'Con balance mayor a 0'">
+      </app-kpi-card>
+
+      <!-- Créditos Otorgados Este Mes -->
+      <app-kpi-card 
+        [title]="'Otorgados Este Mes'"
+        [value]="formatCurrency(stats()?.creditsGrantedThisMonth || 0) + ' Bs'"
+        [icon]="'add_circle'"
+        [color]="'green'"
+        [subtitle]="'Créditos generados en ' + getCurrentMonth()">
+      </app-kpi-card>
+
+      <!-- Créditos Usados Este Mes -->
+      <app-kpi-card 
+        [title]="'Usados Este Mes'"
+        [value]="formatCurrency(stats()?.creditsUsedThisMonth || 0) + ' Bs'"
+        [icon]="'shopping_cart'"
+        [color]="'blue'"
+        [subtitle]="'Consumo en ' + getCurrentMonth()">
+      </app-kpi-card>
+
+      <!-- Créditos por Vencer (30 días) -->
+      <app-kpi-card 
+        [title]="'Por Vencer (30 días)'"
+        [value]="formatCurrency(stats()?.creditsExpiringIn30Days || 0) + ' Bs'"
+        [icon]="'schedule'"
+        [color]="'yellow'"
+        [subtitle]="'Requieren atención pronto'">
+      </app-kpi-card>
+
+      <!-- Promedio por Usuario -->
+      <app-kpi-card 
+        [title]="'Promedio por Usuario'"
+        [value]="formatCurrency(stats()?.averageBalancePerUser || 0) + ' Bs'"
+        [icon]="'trending_up'"
+        [color]="'gray'"
+        [subtitle]="'Balance medio entre usuarios'">
+      </app-kpi-card>
     </div>
 
-    <!-- Secondary Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" *ngIf="stats()">
-      <!-- Credits Expired -->
-      <mat-card>
-        <mat-card-content class="stat-content">
-          <mat-icon class="stat-icon text-red-500">access_time</mat-icon>
-          <div class="stat-details">
-            <p class="stat-label">Créditos Expirados</p>
-            <p class="stat-value">{{ formatCurrency(stats()?.totalCreditsExpired || 0) }}</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Average Balance -->
-      <mat-card>
-        <mat-card-content class="stat-content">
-          <mat-icon class="stat-icon text-indigo-500">trending_up</mat-icon>
-          <div class="stat-details">
-            <p class="stat-label">Balance Promedio</p>
-            <p class="stat-value">{{ formatCurrency(stats()?.averageBalance || 0) }}</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-
-    <!-- Transactions by Type -->
-    <mat-card class="transactions-type-card mb-6" *ngIf="stats() && stats()?.transactionsByType">
-      <mat-card-header>
-        <mat-card-title class="flex items-center gap-2">
-          <mat-icon>pie_chart</mat-icon>
-          Transacciones por Tipo
-        </mat-card-title>
-      </mat-card-header>
+    <!-- Alerts Section -->
+    <mat-card *ngIf="hasUpcomingExpirations()" class="bg-yellow-50 border-l-4 border-yellow-500">
       <mat-card-content>
-        <div class="transaction-types-grid">
-          <div class="transaction-type-item" *ngIf="stats()?.transactionsByType.grant">
-            <div class="type-header">
-              <mat-icon class="text-green-500">add_circle</mat-icon>
-              <span class="type-label">Otorgados</span>
-            </div>
-            <div class="type-value">{{ stats()?.transactionsByType.grant }}</div>
+        <div class="flex items-center gap-3">
+          <mat-icon class="text-yellow-600">warning</mat-icon>
+          <div class="flex-1">
+            <p class="font-semibold text-yellow-800">Créditos por Vencer</p>
+            <p class="text-yellow-700">
+              Hay {{ formatCurrency(stats()?.creditsExpiringIn30Days || 0) }} Bs en créditos que vencerán en los próximos 30 días.
+            </p>
           </div>
-
-          <div class="transaction-type-item" *ngIf="stats()?.transactionsByType.usage">
-            <div class="type-header">
-              <mat-icon class="text-blue-500">shopping_cart</mat-icon>
-              <span class="type-label">Usados</span>
-            </div>
-            <div class="type-value">{{ stats()?.transactionsByType.usage }}</div>
-          </div>
-
-          <div class="transaction-type-item" *ngIf="stats()?.transactionsByType.refund">
-            <div class="type-header">
-              <mat-icon class="text-orange-500">undo</mat-icon>
-              <span class="type-label">Reembolsados</span>
-            </div>
-            <div class="type-value">{{ stats()?.transactionsByType.refund }}</div>
-          </div>
-
-          <div class="transaction-type-item" *ngIf="stats()?.transactionsByType.expiration">
-            <div class="type-header">
-              <mat-icon class="text-red-500">access_time</mat-icon>
-              <span class="type-label">Expirados</span>
-            </div>
-            <div class="type-value">{{ stats()?.transactionsByType.expiration }}</div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Top Users -->
-    <mat-card class="top-users-card mb-6" *ngIf="stats() && stats()?.topUsers && stats()!.topUsers.length > 0">
-      <mat-card-header>
-        <mat-card-title class="flex items-center gap-2">
-          <mat-icon>leaderboard</mat-icon>
-          Top Usuarios con Créditos
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="top-users-list">
-          <div *ngFor="let user of stats()?.topUsers; let i = index" class="top-user-item">
-            <div class="user-rank">{{ i + 1 }}</div>
-            <div class="user-info">
-              <div class="user-name">{{ user.userName }}</div>
-              <div class="user-stats">
-                Balance: {{ formatCurrency(user.balance) }} • Total ganado: {{ formatCurrency(user.totalEarned) }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Recent Transactions -->
-    <mat-card class="recent-transactions-card">
-      <mat-card-header>
-        <mat-card-title class="flex items-center gap-2 justify-between w-full">
-          <div class="flex items-center gap-2">
-            <mat-icon>history</mat-icon>
-            Transacciones Recientes
-          </div>
-          <button mat-button color="primary" (click)="navigateToTransactions()">
-            Ver todas
-            <mat-icon>arrow_forward</mat-icon>
+          <button mat-stroked-button color="warn" (click)="navigateToExpirations()">
+            Ver Detalles
           </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Credits by Source -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title class="flex items-center gap-2">
+          <mat-icon>source</mat-icon>
+          Distribución por Fuente
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div class="table-container" *ngIf="recentTransactions().length > 0">
-          <table mat-table [dataSource]="recentTransactions()" class="w-full">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+          <!-- Referral -->
+          <div class="p-4 bg-blue-50 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Referidos</span>
+              <mat-icon class="text-blue-500">people</mat-icon>
+            </div>
+            <p class="text-2xl font-bold text-blue-700 mt-2">
+              {{ formatCurrency((stats()?.bySource?.referral ?? 0)) }} Bs
+            </p>
+          </div>
+
+          <!-- Admin -->
+          <div class="p-4 bg-purple-50 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Admin</span>
+              <mat-icon class="text-purple-500">admin_panel_settings</mat-icon>
+            </div>
+            <p class="text-2xl font-bold text-purple-700 mt-2">
+              {{ formatCurrency((stats()?.bySource?.admin ?? 0)) }} Bs
+            </p>
+          </div>
+
+          <!-- Promotion -->
+          <div class="p-4 bg-green-50 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Promociones</span>
+              <mat-icon class="text-green-500">local_offer</mat-icon>
+            </div>
+            <p class="text-2xl font-bold text-green-700 mt-2">
+              {{ formatCurrency((stats()?.bySource?.promotion ?? 0)) }} Bs
+            </p>
+          </div>
+
+          <!-- Refund -->
+          <div class="p-4 bg-orange-50 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Reembolsos</span>
+              <mat-icon class="text-orange-500">replay</mat-icon>
+            </div>
+            <p class="text-2xl font-bold text-orange-700 mt-2">
+              {{ formatCurrency((stats()?.bySource?.refund ?? 0)) }} Bs
+            </p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Transactions Table -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title class="flex items-center gap-2">
+          <mat-icon>history</mat-icon>
+          Actividad Reciente
+        </mat-card-title>
+        <mat-card-subtitle>Últimas 20 transacciones del sistema</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="overflow-x-auto mt-4">
+          <table mat-table [dataSource]="stats()?.recentTransactions || []" class="w-full">
+            
             <!-- Created At Column -->
             <ng-container matColumnDef="createdAt">
-              <th mat-header-cell *matHeaderCellDef>Fecha</th>
-              <td mat-cell *matCellDef="let transaction">{{ formatDate(transaction.createdAt) }}</td>
+              <th mat-header-cell *matHeaderCellDef class="font-semibold">Fecha</th>
+              <td mat-cell *matCellDef="let transaction">
+                {{ formatDate(transaction.createdAt) }}
+              </td>
             </ng-container>
 
             <!-- User Name Column -->
             <ng-container matColumnDef="userName">
-              <th mat-header-cell *matHeaderCellDef>Usuario</th>
-              <td mat-cell *matCellDef="let transaction">{{ transaction.userName || 'N/A' }}</td>
+              <th mat-header-cell *matHeaderCellDef class="font-semibold">Usuario</th>
+              <td mat-cell *matCellDef="let transaction">
+                <div class="flex items-center gap-2">
+                  <mat-icon class="text-gray-500 text-sm">person</mat-icon>
+                  {{ transaction.userName }}
+                </div>
+              </td>
             </ng-container>
 
             <!-- Type Column -->
             <ng-container matColumnDef="type">
-              <th mat-header-cell *matHeaderCellDef>Tipo</th>
+              <th mat-header-cell *matHeaderCellDef class="font-semibold">Tipo</th>
               <td mat-cell *matCellDef="let transaction">
-                <mat-chip [ngClass]="'chip-' + getTypeColor(transaction.type)">
-                  {{ getTypeLabel(transaction.type) }}
+                <mat-chip [ngClass]="{
+                  'bg-green-100 text-green-800': transaction.type === 'earned',
+                  'bg-blue-100 text-blue-800': transaction.type === 'used',
+                  'bg-red-100 text-red-800': transaction.type === 'expired',
+                  'bg-orange-100 text-orange-800': transaction.type === 'refunded'
+                }">
+                  {{ transaction.type | creditType }}
                 </mat-chip>
               </td>
             </ng-container>
 
             <!-- Amount Column -->
             <ng-container matColumnDef="amount">
-              <th mat-header-cell *matHeaderCellDef>Monto</th>
-              <td mat-cell *matCellDef="let transaction">
-                <span [ngClass]="transaction.amount > 0 ? 'text-green-600' : 'text-red-600'" class="font-semibold">
-                  {{ transaction.amount > 0 ? '+' : '' }}{{ formatCurrency(transaction.amount) }}
+              <th mat-header-cell *matHeaderCellDef class="font-semibold text-right">Monto</th>
+              <td mat-cell *matCellDef="let transaction" class="text-right">
+                <span [ngClass]="{
+                  'text-green-600 font-semibold': transaction.type === 'earned' || transaction.type === 'refunded',
+                  'text-red-600 font-semibold': transaction.type === 'used' || transaction.type === 'expired'
+                }">
+                  {{ transaction.type === 'earned' || transaction.type === 'refunded' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }} Bs
                 </span>
               </td>
             </ng-container>
 
-            <!-- Reason Column -->
-            <ng-container matColumnDef="reason">
-              <th mat-header-cell *matHeaderCellDef>Razón</th>
-              <td mat-cell *matCellDef="let transaction">{{ transaction.reason || '-' }}</td>
+            <!-- Source Column -->
+            <ng-container matColumnDef="source">
+              <th mat-header-cell *matHeaderCellDef class="font-semibold">Fuente</th>
+              <td mat-cell *matCellDef="let transaction">
+                {{ transaction.source | creditSource }}
+              </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef class="font-semibold">Descripción</th>
+              <td mat-cell *matCellDef="let transaction" class="max-w-xs truncate">
+                {{ transaction.description || '-' }}
+              </td>
             </ng-container>
 
             <!-- Balance After Column -->
             <ng-container matColumnDef="balanceAfter">
-              <th mat-header-cell *matHeaderCellDef>Balance Resultante</th>
-              <td mat-cell *matCellDef="let transaction">
-                <span class="font-semibold">{{ formatCurrency(transaction.balanceAfter) }}</span>
+              <th mat-header-cell *matHeaderCellDef class="font-semibold text-right">Balance Después</th>
+              <td mat-cell *matCellDef="let transaction" class="text-right font-medium">
+                {{ formatCurrency(transaction.balanceAfter) }} Bs
               </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
-        </div>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
 
-        <!-- Empty State -->
-        <div *ngIf="recentTransactions().length === 0" class="empty-state">
-          <mat-icon class="empty-icon">receipt_long</mat-icon>
-          <h3>Sin transacciones</h3>
-          <p>No hay transacciones de créditos registradas.</p>
+            <!-- No Data Row -->
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell text-center py-8 text-gray-500" [attr.colspan]="displayedColumns.length">
+                <mat-icon class="text-gray-400">inbox</mat-icon>
+                <p>No hay transacciones recientes</p>
+              </td>
+            </tr>
+          </table>
         </div>
       </mat-card-content>
     </mat-card>
+
   </div>
 </div>
-

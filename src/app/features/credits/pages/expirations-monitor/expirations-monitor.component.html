@@ -1,0 +1,277 @@
+<div class="expirations-monitor-container p-6">
+  <!-- Header -->
+  <div class="header-section mb-6">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <button mat-icon-button (click)="goBack()" matTooltip="Volver al dashboard">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <h1 class="text-3xl font-bold">Monitor de Expiraciones</h1>
+          <p class="text-gray-600">Gestiona créditos próximos a vencer</p>
+        </div>
+      </div>
+      <button 
+        mat-raised-button 
+        color="warn"
+        (click)="processExpiredCredits()"
+        [disabled]="processing() || loading()"
+      >
+        <mat-spinner *ngIf="processing()" diameter="20" class="mr-2"></mat-spinner>
+        <mat-icon *ngIf="!processing()">delete_sweep</mat-icon>
+        {{ processing() ? 'Procesando...' : 'Procesar Expiraciones' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Alert -->
+  <mat-card *ngIf="success()" class="bg-green-50 border-l-4 border-green-500 mb-6">
+    <mat-card-content>
+      <div class="flex items-start gap-3">
+        <mat-icon class="text-green-500 mt-1">check_circle</mat-icon>
+        <div class="flex-1">
+          <p class="font-semibold text-green-800">Expiraciones Procesadas Exitosamente</p>
+          <div *ngIf="processResult()" class="mt-2 grid grid-cols-3 gap-4">
+            <div class="bg-green-100 p-3 rounded">
+              <p class="text-green-600 text-xs">Créditos Expirados</p>
+              <p class="text-2xl font-bold text-green-700">{{ formatCurrency(processResult()?.result?.totalExpired || 0) }} Bs</p>
+            </div>
+            <div class="bg-blue-100 p-3 rounded">
+              <p class="text-blue-600 text-xs">Usuarios Afectados</p>
+              <p class="text-2xl font-bold text-blue-700">{{ processResult()?.result?.usersAffected || 0 }}</p>
+            </div>
+            <div class="bg-purple-100 p-3 rounded">
+              <p class="text-purple-600 text-xs">Transacciones Creadas</p>
+              <p class="text-2xl font-bold text-purple-700">{{ processResult()?.result?.transactionsCreated || 0 }}</p>
+            </div>
+          </div>
+        </div>
+        <button mat-icon-button (click)="success.set(false)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Error Alert -->
+  <mat-card *ngIf="error()" class="bg-red-50 border-l-4 border-red-500 mb-6">
+    <mat-card-content>
+      <div class="flex items-start gap-3">
+        <mat-icon class="text-red-500 mt-1">error</mat-icon>
+        <div class="flex-1">
+          <p class="font-semibold text-red-700">Error</p>
+          <p class="text-red-600">{{ error() }}</p>
+        </div>
+        <button mat-icon-button (click)="error.set(null)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="flex justify-center items-center py-16">
+    <mat-spinner diameter="64"></mat-spinner>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading() && expirationData()" class="space-y-6">
+    
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <mat-card class="text-center">
+        <mat-card-content>
+          <mat-icon class="text-yellow-500 text-4xl">schedule</mat-icon>
+          <p class="text-gray-600 text-sm mt-2">Total a Expirar</p>
+          <p class="text-2xl font-bold text-yellow-600">
+            {{ formatCurrency(expirationData()?.summary?.totalCreditsExpiring || 0) }} Bs
+          </p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="text-center">
+        <mat-card-content>
+          <mat-icon class="text-blue-500 text-4xl">people</mat-icon>
+          <p class="text-gray-600 text-sm mt-2">Usuarios Afectados</p>
+          <p class="text-2xl font-bold text-blue-600">
+            {{ expirationData()?.summary?.totalUsersAffected || 0 }}
+          </p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="text-center">
+        <mat-card-content>
+          <mat-icon class="text-red-500 text-4xl">warning</mat-icon>
+          <p class="text-gray-600 text-sm mt-2">Vencen en 7 días</p>
+          <p class="text-2xl font-bold text-red-600">
+            {{ formatCurrency(expirationData()?.summary?.expiringIn7Days || 0) }} Bs
+          </p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="text-center">
+        <mat-card-content>
+          <mat-icon class="text-orange-500 text-4xl">event</mat-icon>
+          <p class="text-gray-600 text-sm mt-2">Vencen en 30 días</p>
+          <p class="text-2xl font-bold text-orange-600">
+            {{ formatCurrency(expirationData()?.summary?.expiringIn30Days || 0) }} Bs
+          </p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Last Cron Run Info -->
+    <mat-card class="bg-blue-50">
+      <mat-card-content>
+        <div class="flex items-center gap-3">
+          <mat-icon class="text-blue-600">info</mat-icon>
+          <div>
+            <p class="text-sm text-blue-800">
+              <strong>Última ejecución automática:</strong> 
+              {{ formatDateTime(expirationData()?.lastCronRun || '') }}
+            </p>
+            <p class="text-xs text-blue-600">El sistema procesa automáticamente las expiraciones todos los días</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Filters -->
+    <mat-card>
+      <mat-card-content>
+        <div class="flex items-center gap-4">
+          <mat-icon class="text-gray-500">filter_list</mat-icon>
+          <span class="text-sm font-medium text-gray-700">Mostrar créditos que vencen en:</span>
+          <mat-button-toggle-group 
+            [value]="selectedDays()" 
+            (change)="onDaysFilterChange($event.value)"
+          >
+            <mat-button-toggle *ngFor="let days of daysOptions" [value]="days">
+              {{ days }} días
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Expirations Table -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title class="flex items-center gap-2">
+          <mat-icon>list</mat-icon>
+          Créditos Próximos a Vencer
+        </mat-card-title>
+        <mat-card-subtitle>
+          {{ expirationData()?.expirations?.length || 0 }} registro(s) encontrado(s)
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="overflow-x-auto mt-4">
+          <table mat-table [dataSource]="expirationData()?.expirations || []" class="w-full">
+            
+            <!-- User Name Column -->
+            <ng-container matColumnDef="userName">
+              <th mat-header-cell *matHeaderCellDef class="font-semibold">Usuario</th>
+              <td mat-cell *matCellDef="let expiration">
+                <div class="flex items-center gap-2">
+                  <mat-icon class="text-gray-500">person</mat-icon>
+                  <span class="font-medium">{{ expiration.userName }}</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Email Column -->
+            <ng-container matColumnDef="userEmail">
+              <th mat-header-cell *matHeaderCellDef class="font-semibold">Email</th>
+              <td mat-cell *matCellDef="let expiration">
+                <span class="text-sm text-gray-600">{{ expiration.userEmail }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Current Balance Column -->
+            <ng-container matColumnDef="currentBalance">
+              <th mat-header-cell *matHeaderCellDef class="font-semibold text-right">Balance Actual</th>
+              <td mat-cell *matCellDef="let expiration" class="text-right">
+                <span class="font-medium">{{ formatCurrency(expiration.currentBalance) }} Bs</span>
+              </td>
+            </ng-container>
+
+            <!-- Amount to Expire Column -->
+            <ng-container matColumnDef="amountToExpire">
+              <th mat-header-cell *matHeaderCellDef class="font-semibold text-right">Monto a Expirar</th>
+              <td mat-cell *matCellDef="let expiration" class="text-right">
+                <span class="font-semibold text-red-600">{{ formatCurrency(expiration.amountToExpire) }} Bs</span>
+              </td>
+            </ng-container>
+
+            <!-- Expiration Date Column -->
+            <ng-container matColumnDef="expirationDate">
+              <th mat-header-cell *matHeaderCellDef class="font-semibold">Fecha de Vencimiento</th>
+              <td mat-cell *matCellDef="let expiration">
+                <span class="text-sm">{{ formatDate(expiration.expirationDate) }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Days Remaining Column -->
+            <ng-container matColumnDef="daysRemaining">
+              <th mat-header-cell *matHeaderCellDef class="font-semibold text-center">Días Restantes</th>
+              <td mat-cell *matCellDef="let expiration" class="text-center">
+                <mat-chip [ngClass]="getDaysRemainingBadge(expiration.daysRemaining)">
+                  <strong>{{ expiration.daysRemaining }}</strong> {{ expiration.daysRemaining === 1 ? 'día' : 'días' }}
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="font-semibold text-center">Acciones</th>
+              <td mat-cell *matCellDef="let expiration" class="text-center">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="viewUserDetail(expiration.userId)"
+                  matTooltip="Ver detalle del usuario"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
+
+            <!-- No Data Row -->
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell text-center py-8 text-gray-500" [attr.colspan]="displayedColumns.length">
+                <mat-icon class="text-green-400 text-5xl">check_circle</mat-icon>
+                <p class="text-lg mt-2">No hay créditos próximos a vencer</p>
+                <p class="text-sm">Todos los créditos están dentro del período seguro</p>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Help Card -->
+    <mat-card>
+      <mat-card-content>
+        <div class="flex items-start gap-3">
+          <mat-icon class="text-blue-500">help_outline</mat-icon>
+          <div class="text-sm text-gray-700">
+            <p class="font-semibold mb-2">Información sobre expiraciones:</p>
+            <ul class="list-disc list-inside space-y-1 text-gray-600">
+              <li>Los créditos con fecha de vencimiento expiran automáticamente a las 00:00 del día indicado</li>
+              <li>El sistema ejecuta un proceso automático diario para procesar expiraciones</li>
+              <li>Los créditos expirados se convierten en transacciones de tipo "expired"</li>
+              <li>Las expiraciones son irreversibles y reducen el balance del usuario</li>
+              <li>Puedes usar el botón "Procesar Expiraciones" para ejecutar el proceso manualmente</li>
+              <li>Los créditos sin fecha de vencimiento nunca expiran</li>
+            </ul>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>

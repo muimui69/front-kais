@@ -1,1 +1,264 @@
-<p>grant-credits works!</p>
+<div class="grant-credits-container p-6 max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="header-section mb-6">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <button mat-icon-button (click)="goBack()" matTooltip="Volver al dashboard">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <h1 class="text-3xl font-bold">Otorgar Créditos</h1>
+          <p class="text-gray-600">Asigna créditos a un usuario individual</p>
+        </div>
+      </div>
+      <button mat-stroked-button (click)="goToBulkGrant()">
+        <mat-icon>group_add</mat-icon>
+        Otorgamiento Masivo
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Alert -->
+  <mat-card *ngIf="success()" class="bg-green-50 border-l-4 border-green-500 mb-6">
+    <mat-card-content>
+      <div class="flex items-start gap-3">
+        <mat-icon class="text-green-500 mt-1">check_circle</mat-icon>
+        <div class="flex-1">
+          <p class="font-semibold text-green-800">Créditos Otorgados Exitosamente</p>
+          <p class="text-green-700">{{ successMessage() }}</p>
+          <div *ngIf="grantedTransaction()" class="mt-3 text-sm text-green-600">
+            <p><strong>Usuario:</strong> {{ grantedTransaction()?.transaction?.userName }}</p>
+            <p><strong>Monto:</strong> {{ formatCurrency(grantedTransaction()?.transaction?.amount || 0) }} Bs</p>
+            <p><strong>Fuente:</strong> {{ formatSource(grantedTransaction()?.transaction?.source || '') }}</p>
+          </div>
+        </div>
+        <button mat-icon-button (click)="success.set(false)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Error Alert -->
+  <mat-card *ngIf="error()" class="bg-red-50 border-l-4 border-red-500 mb-6">
+    <mat-card-content>
+      <div class="flex items-start gap-3">
+        <mat-icon class="text-red-500 mt-1">error</mat-icon>
+        <div class="flex-1">
+          <p class="font-semibold text-red-700">Error al Otorgar Créditos</p>
+          <p class="text-red-600">{{ error() }}</p>
+        </div>
+        <button mat-icon-button (click)="error.set(null)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Form Card -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title class="flex items-center gap-2">
+        <mat-icon>add_circle</mat-icon>
+        Formulario de Otorgamiento
+      </mat-card-title>
+      <mat-card-subtitle>Complete todos los campos para otorgar créditos a un usuario</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="grantForm" (ngSubmit)="onSubmit()" class="space-y-6 mt-6">
+
+        <!-- User Selection -->
+        <div>
+          <mat-label class="block text-sm font-medium text-gray-700 mb-2">
+            Usuario <span class="text-red-500">*</span>
+          </mat-label>
+
+          <!-- Selected User Display -->
+          <div *ngIf="selectedUser()" class="flex items-center justify-between p-4 bg-blue-50 rounded-lg mb-3">
+            <div class="flex items-center gap-3">
+              <mat-icon class="text-blue-600">person</mat-icon>
+              <div>
+                <p class="font-semibold text-blue-900">{{ selectedUser()?.name }}</p>
+                <p class="text-sm text-blue-700">{{ selectedUser()?.email }}</p>
+                <p class="text-xs text-blue-600">ID: {{ selectedUser()?.id }}</p>
+              </div>
+            </div>
+            <button mat-icon-button type="button" (click)="clearUserSelection()" matTooltip="Cambiar usuario">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <!-- User Search Input -->
+          <mat-form-field appearance="outline" class="w-full" *ngIf="!selectedUser()">
+            <mat-label>Buscar usuario por nombre, email o ID</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="userId"
+              placeholder="Ej: Juan Pérez, juan@example.com"
+            />
+            <mat-icon matPrefix>search</mat-icon>
+            <mat-spinner *ngIf="searchingUsers()" matSuffix diameter="20"></mat-spinner>
+            <mat-error *ngIf="grantForm.get('userId')?.hasError('required')">
+              Debe seleccionar un usuario
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Search Results -->
+          <div *ngIf="userSearchResults().length > 0 && !selectedUser()" class="border rounded-lg shadow-sm mt-2 max-h-64 overflow-y-auto">
+            <button
+              type="button"
+              *ngFor="let user of userSearchResults()"
+              class="w-full text-left p-4 hover:bg-gray-50 flex items-center gap-3 border-b last:border-b-0"
+              (click)="onUserSelected(user)"
+            >
+              <mat-icon class="text-gray-500">person</mat-icon>
+              <div class="flex-1">
+                <p class="font-medium text-gray-900">{{ user.name }}</p>
+                <p class="text-sm text-gray-600">{{ user.email }}</p>
+                <p class="text-xs text-gray-500">ID: {{ user.id }}</p>
+              </div>
+              <mat-icon class="text-gray-400">chevron_right</mat-icon>
+            </button>
+          </div>
+
+          <!-- No Results Message -->
+          <div *ngIf="userSearchQuery() && userSearchResults().length === 0 && !searchingUsers() && !selectedUser()" class="text-center py-4 text-gray-500">
+            <mat-icon class="text-gray-400">search_off</mat-icon>
+            <p class="text-sm">No se encontraron usuarios con "{{ userSearchQuery() }}"</p>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Amount -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Monto de Créditos</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="amount"
+            placeholder="Ej: 100.00"
+            step="0.01"
+            min="0.01"
+            max="10000"
+          />
+          <span matPrefix>Bs&nbsp;</span>
+          <mat-icon matSuffix>attach_money</mat-icon>
+          <mat-hint>Mínimo: 0.01 Bs - Máximo: 10,000.00 Bs</mat-hint>
+          <mat-error>{{ getErrorMessage('amount') }}</mat-error>
+        </mat-form-field>
+
+        <!-- Source -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Fuente del Crédito</mat-label>
+          <mat-select formControlName="source">
+            <mat-option *ngFor="let source of sourceOptions" [value]="source.value">
+              <div class="flex items-center gap-2">
+                <mat-icon class="text-gray-500">{{ source.icon }}</mat-icon>
+                <span>{{ source.label }}</span>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-error>{{ getErrorMessage('source') }}</mat-error>
+        </mat-form-field>
+
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Descripción / Motivo</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            placeholder="Ej: Bono de bienvenida, Compensación por error, etc."
+            rows="3"
+            maxlength="200"
+          ></textarea>
+          <mat-icon matPrefix>description</mat-icon>
+          <mat-hint align="end">{{ grantForm.get('description')?.value?.length || 0 }} / 200</mat-hint>
+          <mat-error>{{ getErrorMessage('description') }}</mat-error>
+        </mat-form-field>
+
+        <!-- Expiration Date (Optional) -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Fecha de Vencimiento (Opcional)</mat-label>
+          <input
+            matInput
+            type="date"
+            formControlName="expiresAt"
+            [min]="minExpirationDate"
+          />
+          <mat-icon matPrefix>event</mat-icon>
+          <mat-hint>Dejar vacío si los créditos no expiran</mat-hint>
+        </mat-form-field>
+
+        <mat-divider></mat-divider>
+
+        <!-- Preview Summary -->
+        <div *ngIf="grantForm.get('amount')?.value && selectedUser()" class="bg-gray-50 p-4 rounded-lg">
+          <p class="text-sm font-semibold text-gray-700 mb-2">Resumen del Otorgamiento</p>
+          <div class="space-y-1 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Usuario:</span>
+              <span class="font-medium">{{ selectedUser()?.name }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Monto:</span>
+              <span class="font-medium text-green-600">+ {{ formatCurrency(grantForm.get('amount')?.value || 0) }} Bs</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Fuente:</span>
+              <span class="font-medium">{{ getSourceLabelFromForm() }}</span>
+            </div>
+            <div class="flex justify-between" *ngIf="hasExpirationDate()">
+              <span class="text-gray-600">Vence:</span>
+              <span class="font-medium">{{ getExpirationDateValue() | date:'mediumDate' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3 justify-end">
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="resetForm()"
+            [disabled]="loading()"
+          >
+            <mat-icon>refresh</mat-icon>
+            Limpiar
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="grantForm.invalid || loading()"
+          >
+            <mat-spinner *ngIf="loading()" diameter="20" class="mr-2"></mat-spinner>
+            <mat-icon *ngIf="!loading()">check</mat-icon>
+            {{ loading() ? 'Procesando...' : 'Otorgar Créditos' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Help Card -->
+  <mat-card class="mt-6">
+    <mat-card-content>
+      <div class="flex items-start gap-3">
+        <mat-icon class="text-blue-500">info</mat-icon>
+        <div class="text-sm text-gray-700">
+          <p class="font-semibold mb-2">Información sobre el otorgamiento de créditos:</p>
+          <ul class="list-disc list-inside space-y-1 text-gray-600">
+            <li>Los créditos se acreditan inmediatamente al usuario</li>
+            <li>La fuente "Administrativo" se usa para otorgamientos manuales generales</li>
+            <li>La fuente "Promoción" se usa para campañas promocionales</li>
+            <li>La fuente "Reembolso" se usa cuando se devuelven créditos por error o cancelación</li>
+            <li>Si establece una fecha de vencimiento, los créditos expirarán automáticamente en esa fecha</li>
+            <li>Todos los otorgamientos quedan registrados en el historial de auditoría</li>
+          </ul>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

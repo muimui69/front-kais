@@ -12,9 +12,9 @@ export interface CreditTransaction {
   id: number;
   userId: number;
   amount: number;
-  type: 'grant' | 'usage' | 'refund' | 'expiration';
-  reason?: string;
-  referenceType?: 'subscription' | 'extra' | 'ad_subscription' | 'referral' | 'admin_grant';
+  type: 'earned' | 'used' | 'expired' | 'refunded';
+  description?: string;
+  source: 'referral' | 'admin' | 'promotion' | 'refund';
   referenceId?: number;
   balanceBefore: number;
   balanceAfter: number;
@@ -24,6 +24,7 @@ export interface CreditTransaction {
   userName?: string;
   userEmail?: string;
   grantedByName?: string;
+  relatedTransactionId?: number; // Para refunds
 }
 
 /**
@@ -46,7 +47,8 @@ export interface CreditBalance {
 export interface GrantCreditsDTO {
   userId: number;
   amount: number;
-  reason: string;
+  source: 'referral' | 'admin' | 'promotion' | 'refund';
+  description: string;
   expiresAt?: string;
 }
 
@@ -56,7 +58,7 @@ export interface GrantCreditsDTO {
 export interface UseCreditsDTO {
   userId: number;
   amount: number;
-  referenceType: 'subscription' | 'extra' | 'ad_subscription';
+  source: 'referral' | 'admin' | 'promotion' | 'refund';
   referenceId: number;
 }
 
@@ -73,8 +75,9 @@ export interface UserCreditStats {
   transactionCount: number;
   lastTransaction?: string;
   sources: {
-    admin_grant: number;
+    admin: number;
     referral: number;
+    promotion: number;
     refund: number;
   };
   usage: {
@@ -102,10 +105,10 @@ export interface GlobalCreditStats {
     totalEarned: number;
   }>;
   transactionsByType: {
-    grant: number;
-    usage: number;
-    refund: number;
-    expiration: number;
+    earned: number;
+    used: number;
+    refunded: number;
+    expired: number;
   };
   creditsGrantedByMonth: Array<{
     month: string;
@@ -118,12 +121,14 @@ export interface GlobalCreditStats {
  */
 export interface CreditTransactionFilters {
   userId?: number;
-  type?: 'grant' | 'usage' | 'refund' | 'expiration';
-  referenceType?: 'subscription' | 'extra' | 'ad_subscription' | 'referral' | 'admin_grant';
+  type?: 'earned' | 'used' | 'expired' | 'refunded';
+  source?: 'referral' | 'admin' | 'promotion' | 'refund';
   startDate?: string;
   endDate?: string;
   minAmount?: number;
   maxAmount?: number;
+  page?: number;
+  limit?: number;
 }
 
 /**

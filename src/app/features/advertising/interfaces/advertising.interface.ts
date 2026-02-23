@@ -20,6 +20,20 @@ export interface Advertisement {
   activeSubscriptions?: number;
 }
 
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  lastPage: number;
+  limit: number;
+}
+
+export interface PaginatedApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  meta: PaginationMeta;
+}
+
 export interface CreateAdvertisementDTO {
   companyId: number;
   imageUrl: string;

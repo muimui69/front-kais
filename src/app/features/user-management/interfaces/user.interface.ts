@@ -59,6 +59,12 @@ export interface PaginatedUsers {
     pagination: Pagination;
 }
 
+export interface searchBackUsersResponse {
+    success: boolean;
+    message: string;
+    data: searchUsersResponse[];
+}
+
 export interface Users {
     userEmail: string;
     userPhone: string;
@@ -70,6 +76,14 @@ export interface Users {
     createdAt: CreatedAt;
     isActive: boolean;
     isVerified: boolean;
+}
+
+
+ export interface searchUsersResponse {
+   id:number;
+  name:string;
+  email:string;
+  lastName:string;
 }
 
 export interface CreatedAt {

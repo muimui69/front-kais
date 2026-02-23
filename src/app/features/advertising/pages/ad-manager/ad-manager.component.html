@@ -28,6 +28,58 @@
       </a>
     </div>
 
+    <!-- Filtros Section -->
+    @if (!companyId) {
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Filtro de Empresa -->
+          <div>
+            <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+              <mat-icon class="text-gray-400 text-base">business</mat-icon>
+              Filtrar por Empresa
+            </label>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-select [(ngModel)]="selectedCompanyId" (selectionChange)="onFilterChange()" placeholder="Todas las empresas">
+                <mat-option [value]="null">Todas las empresas</mat-option>
+                @for (company of companies; track company.id) {
+                  <mat-option [value]="company.id">{{ company.businessName }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- Filtro de Estado -->
+          <div>
+            <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+              <mat-icon class="text-gray-400 text-base">toggle_on</mat-icon>
+              Filtrar por Estado
+            </label>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onFilterChange()" placeholder="Todos los estados">
+                <mat-option [value]="null">Todos los estados</mat-option>
+                <mat-option value="true">Activos (con suscripciones)</mat-option>
+                <mat-option value="false">Inactivos (sin suscripciones)</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+        </div>
+
+        <!-- Info de resultados -->
+        @if (!isLoading && ads.length > 0) {
+          <div class="mt-4 pt-4 border-t border-gray-100">
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+              <mat-icon class="text-gray-400 text-base">info</mat-icon>
+              <span class="font-medium">
+                Mostrando {{ (currentPage - 1) * pageSize + 1 }}-{{ Math.min(currentPage * pageSize, totalItems) }} de {{ totalItems }} anuncios
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
     @if (isLoading) {
       <div class="flex flex-col items-center justify-center py-20 animate-pulse">
         <mat-spinner diameter="40" class="mb-4"></mat-spinner>
@@ -79,14 +131,15 @@
               </button>
 
               <button mat-icon-button
-                      [routerLink]="['/ads/edit', ad.id]"
-                      (click)="$event.stopPropagation()"
+                      (click)="onEditAd(ad); $event.stopPropagation()"
+                      matTooltip="Editar Anuncio"
                       class="bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-600 shadow-lg transform scale-90 hover:scale-110 transition-all">
                 <mat-icon>edit</mat-icon>
               </button>
 
               <button mat-icon-button
                       (click)="deleteAd(ad); $event.stopPropagation()"
+                      matTooltip="Eliminar Anuncio"
                       class="bg-white text-gray-700 hover:bg-red-50 hover:text-red-600 shadow-lg transform scale-90 hover:scale-110 transition-all">
                 <mat-icon>delete</mat-icon>
               </button>
@@ -119,6 +172,21 @@
           </div>
         }
 
+      </div>
+    }
+
+    <!-- Paginador -->
+    @if (!isLoading && ads.length > 0 && !companyId) {
+      <div class="mt-10 flex justify-center">
+        <mat-paginator 
+          [length]="totalItems"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [pageIndex]="currentPage - 1"
+          (page)="onPageChange($event)"
+          class="bg-white rounded-2xl shadow-sm border border-gray-100"
+          showFirstLastButtons>
+        </mat-paginator>
       </div>
     }
 

@@ -1,0 +1,328 @@
+<div class="bulk-grant-container p-6">
+  <!-- Header -->
+  <div class="header-section mb-6">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <button mat-icon-button (click)="goBack()" matTooltip="Volver al otorgamiento individual">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <h1 class="text-3xl font-bold">Otorgamiento Masivo de Créditos</h1>
+          <p class="text-gray-600">Asigna créditos a múltiples usuarios simultáneamente</p>
+        </div>
+      </div>
+      <button mat-stroked-button (click)="goToDashboard()">
+        <mat-icon>dashboard</mat-icon>
+        Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Alert -->
+  <mat-card *ngIf="success()" class="bg-green-50 border-l-4 border-green-500 mb-6">
+    <mat-card-content>
+      <div class="flex items-start gap-3">
+        <mat-icon class="text-green-500 mt-1">check_circle</mat-icon>
+        <div class="flex-1">
+          <p class="font-semibold text-green-800">Otorgamiento Masivo Completado</p>
+          <div *ngIf="bulkResponse()" class="mt-2 space-y-1">
+            <div class="grid grid-cols-3 gap-4 text-sm">
+              <div class="bg-green-100 p-3 rounded">
+                <p class="text-green-600 text-xs">Exitosos</p>
+                <p class="text-2xl font-bold text-green-700">{{ bulkResponse()?.results?.successful || 0 }}</p>
+              </div>
+              <div class="bg-red-100 p-3 rounded" *ngIf="(bulkResponse()?.results?.failed || 0) > 0">
+                <p class="text-red-600 text-xs">Fallidos</p>
+                <p class="text-2xl font-bold text-red-700">{{ bulkResponse()?.results?.failed || 0 }}</p>
+              </div>
+              <div class="bg-blue-100 p-3 rounded">
+                <p class="text-blue-600 text-xs">Total Otorgado</p>
+                <p class="text-lg font-bold text-blue-700">{{ formatCurrency(bulkResponse()?.results?.totalAmount || 0) }} Bs</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button mat-icon-button (click)="success.set(false)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Error Alert -->
+  <mat-card *ngIf="error()" class="bg-red-50 border-l-4 border-red-500 mb-6">
+    <mat-card-content>
+      <div class="flex items-start gap-3">
+        <mat-icon class="text-red-500 mt-1">error</mat-icon>
+        <div class="flex-1">
+          <p class="font-semibold text-red-700">Error en Otorgamiento Masivo</p>
+          <p class="text-red-600">{{ error() }}</p>
+        </div>
+        <button mat-icon-button (click)="error.set(null)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left Column: User Selection -->
+    <div class="lg:col-span-2">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title class="flex items-center gap-2">
+            <mat-icon>people</mat-icon>
+            Selección de Usuarios
+          </mat-card-title>
+          <mat-card-subtitle>
+            {{ selectedUserIds().length }} usuario(s) seleccionado(s)
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Search Bar -->
+          <div class="mb-4 mt-4">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Buscar usuarios</mat-label>
+              <input
+                matInput
+                type="text"
+                [value]="searchQuery()"
+                (input)="onSearchChange($any($event.target).value)"
+                placeholder="Buscar por nombre o email"
+              />
+              <mat-icon matPrefix>search</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Selection Info -->
+          <div class="flex justify-between items-center mb-4 p-3 bg-blue-50 rounded-lg">
+            <div class="flex items-center gap-2">
+              <mat-icon class="text-blue-600">info</mat-icon>
+              <span class="text-sm text-blue-800">
+                {{ selectedUserIds().length }} de {{ availableUsers().length }} usuarios seleccionados
+              </span>
+            </div>
+            <button mat-stroked-button color="primary" (click)="toggleAll()" [disabled]="loadingUsers()">
+              <mat-icon>{{ isAllSelected() ? 'deselect' : 'select_all' }}</mat-icon>
+              {{ isAllSelected() ? 'Deseleccionar Todos' : 'Seleccionar Todos' }}
+            </button>
+          </div>
+
+          <!-- Loading Users -->
+          <div *ngIf="loadingUsers()" class="flex justify-center py-8">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+
+          <!-- Users Table -->
+          <div *ngIf="!loadingUsers()" class="overflow-x-auto">
+            <table mat-table [dataSource]="availableUsers()" class="w-full">
+              
+              <!-- Checkbox Column -->
+              <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-checkbox
+                    [checked]="isAllSelected()"
+                    [indeterminate]="selectedUserIds().length > 0 && !isAllSelected()"
+                    (change)="toggleAll()"
+                  ></mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let user">
+                  <mat-checkbox
+                    [checked]="isSelected(user.userId)"
+                    (change)="toggleUser(user.userId)"
+                  ></mat-checkbox>
+                </td>
+              </ng-container>
+
+              <!-- User ID Column -->
+              <ng-container matColumnDef="userId">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">ID</th>
+                <td mat-cell *matCellDef="let user">
+                  <span class="font-mono text-sm text-gray-600">#{{ user.userId }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Full Name Column -->
+              <ng-container matColumnDef="fullName">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Usuario</th>
+                <td mat-cell *matCellDef="let user">
+                  <div class="flex flex-col">
+                    <span class="font-medium">{{ user.fullName }}</span>
+                    <span class="text-sm text-gray-500">{{ '@' + user.userName }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Email Column -->
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Email</th>
+                <td mat-cell *matCellDef="let user">
+                  <div class="flex items-center gap-2">
+                    <mat-icon class="text-gray-400 text-sm">email</mat-icon>
+                    <span class="text-sm">{{ user.userEmail }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                  class="hover:bg-gray-50"
+                  [class.bg-blue-50]="isSelected(row.userId)">
+              </tr>
+
+              <!-- No Data Row -->
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell text-center py-8 text-gray-500" [attr.colspan]="displayedColumns.length">
+                  <mat-icon class="text-gray-400">person_search</mat-icon>
+                  <p>No se encontraron usuarios</p>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Right Column: Grant Form -->
+    <div class="lg:col-span-1">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title class="flex items-center gap-2">
+            <mat-icon>settings</mat-icon>
+            Configuración
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="bulkGrantForm" (ngSubmit)="onSubmit()" class="space-y-4 mt-4">
+            
+            <!-- Amount -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Monto por Usuario</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="amount"
+                placeholder="100.00"
+                step="0.01"
+                min="0.01"
+                max="10000"
+              />
+              <span matPrefix>Bs&nbsp;</span>
+              <mat-hint>Monto individual</mat-hint>
+              <mat-error>{{ getErrorMessage('amount') }}</mat-error>
+            </mat-form-field>
+
+            <!-- Source -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Fuente</mat-label>
+              <mat-select formControlName="source">
+                <mat-option *ngFor="let source of sourceOptions" [value]="source.value">
+                  <div class="flex items-center gap-2">
+                    <mat-icon class="text-gray-500">{{ source.icon }}</mat-icon>
+                    <span>{{ source.label }}</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-error>{{ getErrorMessage('source') }}</mat-error>
+            </mat-form-field>
+
+            <!-- Description -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Descripción</mat-label>
+              <textarea
+                matInput
+                formControlName="description"
+                placeholder="Motivo del otorgamiento"
+                rows="3"
+                maxlength="200"
+              ></textarea>
+              <mat-hint align="end">{{ bulkGrantForm.get('description')?.value?.length || 0 }} / 200</mat-hint>
+              <mat-error>{{ getErrorMessage('description') }}</mat-error>
+            </mat-form-field>
+
+            <!-- Expiration Date -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Vencimiento (Opcional)</mat-label>
+              <input
+                matInput
+                type="date"
+                formControlName="expiresAt"
+                [min]="minExpirationDate"
+              />
+              <mat-icon matPrefix>event</mat-icon>
+            </mat-form-field>
+
+            <mat-divider></mat-divider>
+
+            <!-- Summary -->
+            <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+              <p class="text-sm font-semibold text-gray-700">Resumen</p>
+              <div class="space-y-1 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Usuarios:</span>
+                  <span class="font-medium">{{ selectedUserIds().length }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Monto por usuario:</span>
+                  <span class="font-medium">{{ formatCurrency(bulkGrantForm.get('amount')?.value || 0) }} Bs</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Fuente:</span>
+                  <span class="font-medium">{{ getSourceLabelFromForm() }}</span>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="flex justify-between pt-2">
+                  <span class="text-gray-700 font-semibold">Total:</span>
+                  <span class="font-bold text-green-600 text-lg">{{ formatCurrency(getTotalAmount()) }} Bs</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-2">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                class="w-full"
+                [disabled]="bulkGrantForm.invalid || selectedUserIds().length === 0 || loading()"
+              >
+                <mat-spinner *ngIf="loading()" diameter="20" class="mr-2"></mat-spinner>
+                <mat-icon *ngIf="!loading()">send</mat-icon>
+                {{ loading() ? 'Procesando...' : 'Otorgar a ' + selectedUserIds().length + ' Usuario(s)' }}
+              </button>
+              
+              <button
+                mat-stroked-button
+                type="button"
+                class="w-full"
+                (click)="resetForm()"
+                [disabled]="loading()"
+              >
+                <mat-icon>refresh</mat-icon>
+                Limpiar
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Info Card -->
+      <mat-card class="mt-4">
+        <mat-card-content>
+          <div class="flex items-start gap-2">
+            <mat-icon class="text-blue-500 text-sm">info</mat-icon>
+            <div class="text-xs text-gray-600">
+              <p class="font-semibold mb-1">Información:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Selecciona los usuarios desde la tabla</li>
+                <li>Los créditos se otorgan a todos simultáneamente</li>
+                <li>El proceso es irreversible</li>
+              </ul>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

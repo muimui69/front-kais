@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Company } from '../../../company/interfaces/company.interface';
 import { CompanyService } from '../../../company/services/company.service';
 import { Advertisement } from '../../interfaces/advertising.interface';
@@ -8,6 +8,7 @@ import { AdvertisingService } from '../../services/advertising.service';
 import { environment } from '../../../../../environment/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { SubscriptionModalComponent } from '../../components/subscription-modal/subscription-modal.component';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-ad-manager',
@@ -20,14 +21,32 @@ export class AdManagerComponent implements OnInit {
   private companyService = inject(CompanyService);
   private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
+  private router= inject(Router)
   private dialog = inject(MatDialog);
 
   ads: Advertisement[] = [];
+  companies: Company[] = [];
   currentCompany: Company | null = null;
   companyId: number | null = null;
   isLoading = false;
 
+
+  selectedCompanyId: number | null = null;
+  selectedStatus: string | null = null;
+
+
+  currentPage: number = 1;
+  pageSize: number = 12;
+  totalItems: number = 0;
+  totalPages: number = 0;
+  pageSizeOptions: number[] = [12, 24, 48];
+
+
+  Math = Math;
+
   ngOnInit() {
+    this.loadAllCompanies();
+
     this.route.params.subscribe(params => {
       if (params['companyId']) {
         this.companyId = +params['companyId'];
@@ -35,7 +54,15 @@ export class AdManagerComponent implements OnInit {
       } else {
         this.companyId = null;
         this.currentCompany = null;
-        this.loadAllAds();
+
+        this.route.queryParams.subscribe(queryParams => {
+          this.selectedCompanyId = queryParams['companyId'] ? +queryParams['companyId'] : null;
+          this.selectedStatus = queryParams['isActive'] || null;
+          this.currentPage = queryParams['page'] ? +queryParams['page'] : 1;
+          this.pageSize = queryParams['limit'] ? +queryParams['limit'] : 12;
+
+          this.loadAllAds();
+        });
       }
     });
   }
@@ -59,17 +86,78 @@ export class AdManagerComponent implements OnInit {
     });
   }
 
+  loadAllCompanies() {
+    this.companyService.getAll(false).subscribe({
+      next: (res) => {
+        this.companies = res.data;
+      },
+      error: () => {
+        this.snackBar.open('Error al cargar empresas', 'Cerrar');
+      }
+    });
+  }
+
   loadAllAds() {
     this.isLoading = true;
-    this.adService.getAllAds().subscribe({
+
+    const params: any = {
+      page: this.currentPage,
+      limit: this.pageSize
+    };
+
+    if (this.selectedCompanyId) {
+      params.companyId = this.selectedCompanyId;
+    }
+
+    if (this.selectedStatus !== null) {
+      params.isActive = this.selectedStatus === 'true';
+    }
+
+    this.adService.getAllAds(params).subscribe({
       next: (res) => {
         this.ads = res.data;
+        this.totalItems = res.meta.total;
+        this.totalPages = res.meta.lastPage;
         this.isLoading = false;
+
+        this.updateQueryParams();
       },
       error: () => {
         this.isLoading = false;
         this.snackBar.open('Error al cargar el listado general', 'Cerrar');
       }
+    });
+  }
+
+  onFilterChange() {
+    this.currentPage = 1;
+    this.loadAllAds();
+  }
+
+  onPageChange(event: PageEvent) {
+    this.currentPage = event.pageIndex + 1;
+    this.pageSize = event.pageSize;
+    this.loadAllAds();
+  }
+
+  updateQueryParams() {
+    const queryParams: any = {
+      page: this.currentPage,
+      limit: this.pageSize
+    };
+
+    if (this.selectedCompanyId) {
+      queryParams.companyId = this.selectedCompanyId;
+    }
+
+    if (this.selectedStatus !== null) {
+      queryParams.isActive = this.selectedStatus;
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      queryParamsHandling: 'merge'
     });
   }
 
@@ -85,6 +173,11 @@ export class AdManagerComponent implements OnInit {
         this.snackBar.open(err.error?.message || 'No se pudo eliminar', 'Cerrar');
       }
     });
+  }
+
+  onEditAd(ad: Advertisement) {
+    console.log('Editar anuncio', ad);
+    this.router.navigate(['/publicidad/ads/edit/', ad.id]);
   }
 
   openSubscriptionModal(ad: Advertisement) {

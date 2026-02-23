@@ -1,0 +1,7 @@
+.kpi-card {
+  height: 100%;
+}
+
+.kpi-card mat-card-content {
+  padding: 0 !important;
+}

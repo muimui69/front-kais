@@ -1,0 +1,17 @@
+<mat-card class="kpi-card hover:shadow-lg transition-shadow cursor-default">
+  <mat-card-content class="p-6">
+    <div class="flex items-center gap-4">
+      <!-- Icon -->
+      <div [class]="'rounded-full p-3 ' + getBgColorClass()">
+        <mat-icon [class]="'text-3xl ' + getIconColorClass()">{{ icon }}</mat-icon>
+      </div>
+
+      <!-- Content -->
+      <div class="flex-1">
+        <p class="text-sm text-gray-600 mb-1">{{ title }}</p>
+        <p class="text-2xl font-bold text-gray-900">{{ value }}</p>
+        <p *ngIf="subtitle" class="text-xs text-gray-500 mt-1">{{ subtitle }}</p>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

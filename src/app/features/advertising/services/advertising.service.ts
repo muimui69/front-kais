@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environment/environment';
 import {
@@ -7,7 +7,8 @@ import {
   Advertisement,
   CreateAdvertisementDTO,
   AdSubscription,
-  CreateSubscriptionDTO
+  CreateSubscriptionDTO,
+  PaginatedApiResponse
 } from '../interfaces/advertising.interface';
 
 @Injectable({
@@ -32,8 +33,31 @@ export class AdvertisingService {
     );
   }
 
-  getAllAds(): Observable<ApiResponse<Advertisement[]>> {
-    return this.http.get<ApiResponse<Advertisement[]>>(`${this.baseUrl}/ads`);
+  getAllAds(params?: {
+    page?: number;
+    limit?: number;
+    isActive?: boolean;
+    companyId?: number;
+  }): Observable<PaginatedApiResponse<Advertisement[]>> {
+    let httpParams = new HttpParams();
+    
+    if (params?.page) {
+      httpParams = httpParams.set('page', params.page.toString());
+    }
+    if (params?.limit) {
+      httpParams = httpParams.set('limit', params.limit.toString());
+    }
+    if (params?.isActive !== undefined) {
+      httpParams = httpParams.set('isActive', params.isActive.toString());
+    }
+    if (params?.companyId) {
+      httpParams = httpParams.set('companyId', params.companyId.toString());
+    }
+
+    return this.http.get<PaginatedApiResponse<Advertisement[]>>(
+      `${this.baseUrl}/ads`,
+      { params: httpParams }
+    );
   }
 
   getById(id: number): Observable<ApiResponse<Advertisement>> {
