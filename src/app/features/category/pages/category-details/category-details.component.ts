@@ -3,6 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Category } from '../../interfaces/category.interface';
 import { CategoryService } from '../../services/category.service';
+import { environment } from '../../../../../environment/environment';
 
 @Component({
   selector: 'app-category-details',
@@ -19,6 +20,7 @@ export class CategoryDetailsComponent implements OnInit {
   category: Category | null = null;
   loading = true;
   keywordsList: string[] = [];
+  readonly environment = environment;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');

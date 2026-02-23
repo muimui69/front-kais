@@ -7,6 +7,12 @@ export interface Permission {
 
 
 export interface RefreshResponse {
+    success: boolean;
+    message: string;
+    data: RefreshData;
+}
+
+export interface RefreshData{
     accessToken: string;
 }
 

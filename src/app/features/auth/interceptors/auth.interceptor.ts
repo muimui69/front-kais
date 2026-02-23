@@ -25,7 +25,8 @@ export class AuthInterceptor implements HttpInterceptor {
             '/auth/login/panel',
             '/admin-auth/login',
             '/auth/login/mobile',
-            '/auth/refresh'
+            '/auth/refresh',
+             '/admin-auth/refresh'
         ];
 
         const isExcluded = excludedUrls.some(url => request.url.toLowerCase().includes(url.toLowerCase()));
@@ -54,10 +55,11 @@ export class AuthInterceptor implements HttpInterceptor {
 
                     return this.authService.refreshToken().pipe(
                         switchMap((response) => {
-                            this.authService.setAccessToken(response.accessToken);
+                            const newToken = response.data?.accessToken || response.data.accessToken;
+                            this.authService.setAccessToken(newToken);
                             const retryReq = request.clone({
                                 setHeaders: {
-                                    Authorization: `Bearer ${response.accessToken}`
+                                    Authorization: `Bearer ${newToken}`
                                 },
                                 withCredentials: true
                             });

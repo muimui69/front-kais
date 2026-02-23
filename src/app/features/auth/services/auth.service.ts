@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../../environment/environment';
-// Asegúrate de que tus interfaces coincidan con las que creamos en el paso anterior
 import { LoginResponse, RefreshResponse, User } from '../interfaces/auth.inteface';
 
 @Injectable({
@@ -62,17 +61,23 @@ export class AuthService {
     );
   }
 
-  refreshToken(): Observable<RefreshResponse> {
+ refreshToken(): Observable<RefreshResponse> {
     return this.http.post<RefreshResponse>(
-      `${this.baseUrl}/auth/refresh`,
+      `${this.baseUrl}/admin-auth/refresh`,
       {},
       { withCredentials: true }
+    ).pipe(
+      tap(response => {
+        if (response.success && response.data) {
+          this.setAccessToken(response.data.accessToken);
+        }
+      })
     );
   }
 
   logout(): void {
     this.http.post(
-      `${this.baseUrl}/auth/logout`,
+     `${this.baseUrl}/admin-auth/logout`,
       {},
       { withCredentials: true }
     ).subscribe({

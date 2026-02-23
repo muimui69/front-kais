@@ -90,6 +90,25 @@
             </div>
           </div>
 
+          <!-- Sección de Imagen - Solo para nivel 1 -->
+          @if(category.level === 1 && category.imageUrl) {
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-fadeIn">
+              <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/30">
+                <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                  <mat-icon class="text-purple-500">image</mat-icon> Imagen de Categoría
+                </h3>
+              </div>
+              <div class="p-6">
+                <div class="category-image-container">
+                  <img 
+                    [src]="environment.imgUrl + category.imageUrl" 
+                    [alt]="category.name"
+                    class="category-image">
+                </div>
+              </div>
+            </div>
+          }
+
           @if ((category.children?.length ?? 0) > 0) {
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div class="px-6 py-4 border-b border-gray-100">

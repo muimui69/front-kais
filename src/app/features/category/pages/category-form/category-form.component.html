@@ -49,6 +49,61 @@
               <p class="text-xs text-gray-400 mt-1 ml-1 text-right">Se recomienda una descripción corta para SEO.</p>
             </div>
 
+            <!-- Sección de Imagen - Solo para nivel 1 -->
+            @if(form.get('level')?.value === 1) {
+              <div class="image-section">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Imagen de la categoría</label>
+                
+                <div class="flex items-center gap-3 mb-3">
+                  <button 
+                    type="button"
+                    (click)="fileInput.click()"
+                    class="px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-2">
+                    <mat-icon class="text-[18px] w-[18px] h-[18px]">attach_file</mat-icon>
+                    Seleccionar imagen
+                  </button>
+                  
+                  @if(selectedFile) {
+                    <span class="text-sm text-gray-600">{{ selectedFile.name }}</span>
+                  } @else if(existingImageUrl) {
+                    <span class="text-sm text-gray-600">Imagen actual cargada</span>
+                  } @else {
+                    <span class="text-sm text-gray-400">Ninguna imagen seleccionada</span>
+                  }
+                </div>
+
+                <input 
+                  #fileInput
+                  type="file" 
+                  accept="image/jpeg,image/png,image/webp"
+                  (change)="onFileSelected($event)"
+                  style="display: none;">
+
+                <!-- Preview de imagen -->
+                @if(imagePreview || existingImageUrl) {
+                  <div class="image-preview">
+                    <img 
+                      [src]="imagePreview || (environment.imgUrl + existingImageUrl)" 
+                      alt="Preview"
+                      class="preview-img">
+                    <button 
+                      type="button"
+                      mat-mini-fab 
+                      color="warn" 
+                      class="remove-btn"
+                      (click)="removeImage()">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </div>
+                }
+
+                <p class="text-xs text-gray-500 mt-2 ml-1 flex items-center gap-1">
+                  <mat-icon class="text-[14px] w-[14px] h-[14px]">info</mat-icon>
+                  Solo imágenes JPEG, PNG o WEBP. Tamaño máximo: 10MB
+                </p>
+              </div>
+            }
+
              <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5 ml-1">Palabras Clave (Keywords)</label>
               <mat-form-field appearance="outline" class="w-full">

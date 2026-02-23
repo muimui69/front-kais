@@ -107,8 +107,20 @@ export class CategoryService {
     );
   }
 
+  createWithFile(formData: FormData): Observable<ApiResponse<Category>> {
+    return this.http.post<ApiResponse<Category>>(`${this.apiUrl}`, formData,
+      {withCredentials: true}
+    );
+  }
+
   update(id: number, data: UpdateCategoryDTO): Observable<ApiResponse<Category>> {
     return this.http.put<ApiResponse<Category>>(`${this.apiUrl}/${id}`, data,
+      {withCredentials: true}
+    );
+  }
+
+  updateWithFile(id: number, formData: FormData): Observable<ApiResponse<Category>> {
+    return this.http.put<ApiResponse<Category>>(`${this.apiUrl}/${id}`, formData,
       {withCredentials: true}
     );
   }
