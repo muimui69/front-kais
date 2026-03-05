@@ -1,0 +1,265 @@
+<div class="flex items-center mb-4">
+    <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+</div>
+
+<div class="min-h-screen bg-[#F8F9FA] p-4 md:p-8 font-sans">
+    <div class="max-w-6xl mx-auto space-y-6">
+
+        <div class="flex items-center justify-between">
+            <div class="space-y-1">
+                <h1
+                    class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+                    Crear Nueva Notificación
+                </h1>
+                <p class="text-slate-500 text-sm md:text-base">
+                    Configura los detalles y destinatarios de tu mensaje.
+                </p>
+            </div>
+        </div>
+
+        <form [formGroup]="notificationForm" (ngSubmit)="onSubmit()">
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+
+                <div
+                    class="lg:col-span-2 bg-white p-6 md:p-8 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-slate-200/60">
+                    <div class="flex items-center mb-6">
+                        <mat-icon class="text-blue-500 mr-2">settings</mat-icon>
+                        <h2
+                            class="text-lg font-bold text-slate-800">Configuración</h2>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-700 mb-2">
+                                Tipo de Notificación <span
+                                    class="text-red-500">*</span>
+                            </label>
+                            <mat-form-field appearance="outline"
+                                class="w-full">
+                                <mat-select formControlName="type"
+                                    placeholder="Elige el tipo de notificación">
+                                    @for (type of notificationTypes; track
+                                    type.value) {
+                                    <mat-option [value]="type.value">{{
+                                        type.label }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-700 mb-2">
+                                Enviar por <span
+                                    class="text-red-500">*</span>
+                            </label>
+                            <mat-form-field appearance="outline"
+                                class="w-full">
+                                <mat-select formControlName="sendMode"
+                                    placeholder="Elige el modo de envío">
+                                    @for (mode of sendModeOptions; track
+                                    mode.value) {
+                                    <mat-option [value]="mode.value">{{
+                                        mode.label }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        @if(notificationForm.get('type')?.value ===
+                        'SCHEDULED'){
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-700 mb-2">
+                                Para fecha <span
+                                    class="text-red-500">*</span>
+                            </label>
+                            <app-date-picker
+                                formControlName="scheduledDate"
+                                label="Selecciona una fecha"
+                                hint="MMMM DD, YYYY">
+                            </app-date-picker>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-700 mb-2">En
+                                hora
+                                <span class="text-red-500">*</span>
+                            </label>
+
+                            <app-time-picker
+                                formControlName="scheduledTime"
+                                label="Selecciona una hora">
+                            </app-time-picker>
+                        </div>
+                        }
+
+                    </div>
+                </div>
+
+                <div
+                    class="lg:col-span-2 bg-white p-6 md:p-8 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-slate-200/60">
+                    <div class="flex items-center mb-6">
+                        <mat-icon class="text-blue-500 mr-2">article</mat-icon>
+                        <h2
+                            class="text-lg font-bold text-slate-800">Contenido</h2>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-700 mb-2">
+                                Título <span class="text-red-500">*</span>
+                            </label>
+                            <mat-form-field appearance="outline"
+                                class="w-full custom-outline">
+                                <input matInput formControlName="title"
+                                    placeholder="Escribe un título atractivo">
+                            </mat-form-field>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-700 mb-2">
+                                Mensaje <span class="text-red-500">*</span>
+                            </label>
+                            <mat-form-field appearance="outline"
+                                class="w-full custom-outline">
+                                <textarea matInput formControlName="body"
+                                    rows="4"
+                                    placeholder="El cuerpo de tu notificación..."></textarea>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div
+                class="bg-white p-6 md:p-8 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-slate-200/60 mb-6">
+
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <mat-icon class="text-blue-500 mr-2">people</mat-icon>
+                        <h2
+                            class="text-lg font-bold text-slate-800">Destinatarios
+                            <span class="text-red-500">*</span></h2>
+                    </div>
+                    <!-- <button mat-stroked-button type="button"
+                        class="!rounded-lg !border-blue-200 !text-blue-600 hover:!bg-blue-50 font-medium"
+                        (click)="addRecipient()">
+                        <mat-icon class="mr-1">add</mat-icon>
+                        Agregar destinatario
+                    </button> -->
+                </div>
+
+                <div formArrayName="recipients" class="space-y-6">
+                    @for (recipient of recipients.controls; track $index) {
+                    <div [formGroupName]="$index"
+                        class="border border-slate-200 rounded-xl p-6 relative">
+
+                        <!-- <div class="flex items-center justify-between mb-4">
+                            <span
+                                class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                DESTINATARIO #{{ $index + 1 }}
+                            </span>
+                            @if (recipients.length > 1) {
+                            <button mat-icon-button type="button"
+                                class="!text-slate-400 hover:!text-slate-600"
+                                (click)="removeRecipient($index)">
+                                <mat-icon>delete_outline</mat-icon>
+                            </button>
+                            }
+                        </div> -->
+
+                        <div class="mb-6">
+                            <label
+                                class="block text-sm font-medium text-slate-700 mb-2">
+                                Descripción adicional (opcional)
+                            </label>
+                            <mat-form-field appearance="outline"
+                                class="w-full custom-outline">
+                                <input matInput formControlName="description"
+                                    placeholder="Ej. Recordatorio individual">
+                            </mat-form-field>
+                        </div>
+
+                        @if (notificationForm.get('sendMode')?.value ===
+                        'CRITERIA') {
+                        <div class="space-y-4">
+                            <h3
+                                class="text-sm font-bold text-blue-600 uppercase tracking-wide mb-2">Tipo
+                                de usuario:</h3>
+                            <div class="flex gap-6 mb-2"
+                                formGroupName="criteriaFilters">
+                                <mat-radio-group formControlName="userType"
+                                    class="flex flex-row gap-4">
+                                    <mat-radio-button
+                                        [value]="userType.ALL">Todos</mat-radio-button>
+                                    <mat-radio-button
+                                        [value]="userType.PROFESSIONAL">Profesionales</mat-radio-button>
+                                    <mat-radio-button
+                                        [value]="userType.APPLICANT">Solicitantes</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                            <!-- <div
+                                class="border-t border-slate-200 pt-2 mb-2 text-xs text-slate-500">—
+                                Filtros para Profesionales (solo visible si
+                                elige Profesionales o Todos) —</div>
+                            <div class="flex flex-wrap gap-2 mb-2">
+                                <mat-form-field appearance="outline"
+                                    class="w-60">
+                                    <mat-label>Categorías</mat-label>
+                                    <input matInput
+                                        placeholder="Buscar categoría..."
+                                        formControlName="categorySearch">
+                                </mat-form-field>
+                                <mat-checkbox
+                                    formControlName="activeSubscription">Solo
+                                    con suscripción activa</mat-checkbox>
+                            </div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <mat-icon color="primary">groups</mat-icon>
+                                <span class="text-sm">Usuarios que coinciden:
+                                    ~145</span>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-medium text-slate-700 mb-1">Descripción:</label>
+                                <mat-form-field appearance="outline"
+                                    class="w-full">
+                                    <input matInput
+                                        placeholder="Ej: Profesionales activos cat. 5,12..."
+                                        formControlName="description">
+                                </mat-form-field>
+                            </div> -->
+                        </div>
+                        }
+
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <div
+                class="flex justify-end gap-3 pt-8 border-t border-slate-100 mt-8">
+                <button mat-stroked-button type="button"
+                    class="!rounded-xl !h-[44px] !px-6 !border-slate-300 !text-slate-700 hover:!bg-slate-50 font-medium"
+                    (click)="goBack()">
+                    Cancelar
+                </button>
+                <button mat-flat-button color="primary" type="submit"
+                    class="create-notification-button"
+                    [disabled]="notificationForm.invalid">
+                    <mat-icon class="mr-2">add</mat-icon>
+                    Crear Notificación
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>

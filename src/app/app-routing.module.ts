@@ -51,6 +51,10 @@ const routes: Routes = [
     loadChildren: () => import('../app/features/credits/credits.module').then(m => m.CreditsModule),
   },
   {
+    path: 'notifications',
+    loadChildren: () => import('../app/features/notifications/notifications.module').then(m => m.NotificationsModule),
+  },
+  {
     path: '**',
     redirectTo: 'auth'
   }
