@@ -173,11 +173,11 @@ export const menuItem = [
         icon: 'timer',
         router: '/notifications/scheduled',
       },
-      {
-        name: 'Enviar Notificación',
-        icon: 'send',
-        router: '/notifications/immediate',
-      }
+      // {
+      //   name: 'Enviar Notificación',
+      //   icon: 'send',
+      //   router: '/notifications/immediate',
+      // }
     ]
   },
 
