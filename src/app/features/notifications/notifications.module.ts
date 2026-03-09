@@ -11,6 +11,7 @@ import { provideLuxonDateAdapter } from '@angular/material-luxon-adapter';
 import { DatePickerComponent } from "../../shared/components/date-picker/date-picker.component";
 import { TimePickerComponent } from "../../shared/components/time-picker/time-picker.component";
 import { ScheduledNotificationDetailPageComponent } from "./pages/scheduled-notification-detail-page/scheduled-notification-detail-page.component";
+import { EditNotificationPageComponent } from "./pages/edit-notification-page/edit-notification-page.component";
 
 const CUSTOM_DATE_FORMATS = {
     parse: {
@@ -29,7 +30,8 @@ const CUSTOM_DATE_FORMATS = {
         ImmediateNotificationPageComponent,
         ScheduleNotificationPageComponent,
         CreateNotificationPageComponent,
-        ScheduledNotificationDetailPageComponent
+        ScheduledNotificationDetailPageComponent,
+        EditNotificationPageComponent
     ],
     imports: [
         CommonModule,

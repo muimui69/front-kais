@@ -46,7 +46,6 @@
       <form [formGroup]="filterForm">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
 
-          <!-- Status Select -->
           <div class="md:col-span-3">
             <label
               class="block text-sm font-semibold text-slate-700 mb-2.5 ml-1">
@@ -62,7 +61,6 @@
             </mat-form-field>
           </div>
 
-          <!-- Type Select -->
           <div class="md:col-span-3">
             <label
               class="block text-sm font-semibold text-slate-700 mb-2.5 ml-1">
@@ -78,7 +76,6 @@
             </mat-form-field>
           </div>
 
-          <!-- Date Range -->
           <div class="md:col-span-4">
             <label
               class="block text-sm font-semibold text-slate-700 mb-2.5 ml-1">
@@ -120,11 +117,9 @@
       </form>
     </div>
 
-    <!-- Table Card -->
     <div
       class="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200/80 overflow-hidden relative backdrop-blur-sm">
 
-      <!-- Loading Overlay -->
       @if(loading()) {
       <div
         class="absolute inset-0 bg-white/90 z-20 flex items-center justify-center backdrop-blur-md">
@@ -143,7 +138,6 @@
       <div class="overflow-x-auto">
         <table mat-table [dataSource]="dataSource" class="w-full">
 
-          <!-- ID Column -->
           <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef
               class="!pl-8 !font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
@@ -157,7 +151,6 @@
             </td>
           </ng-container>
 
-          <!-- Title Column -->
           <ng-container matColumnDef="title">
             <th mat-header-cell *matHeaderCellDef
               class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
@@ -171,7 +164,6 @@
             </td>
           </ng-container>
 
-          <!-- Body Column -->
           <ng-container matColumnDef="body">
             <th mat-header-cell *matHeaderCellDef
               class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
@@ -185,7 +177,6 @@
             </td>
           </ng-container>
 
-          <!-- Type Column -->
           <ng-container matColumnDef="type">
             <th mat-header-cell *matHeaderCellDef
               class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
@@ -209,7 +200,6 @@
             </td>
           </ng-container>
 
-          <!-- Status Column -->
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef
               class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
@@ -239,7 +229,6 @@
             </td>
           </ng-container>
 
-          <!-- Scheduled At Column -->
           <ng-container matColumnDef="scheduledAt">
             <th mat-header-cell *matHeaderCellDef
               class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
@@ -261,7 +250,6 @@
             </td>
           </ng-container>
 
-          <!-- Created By Column -->
           <ng-container matColumnDef="createdBy">
             <th mat-header-cell *matHeaderCellDef
               class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
@@ -280,7 +268,6 @@
             </td>
           </ng-container>
 
-          <!-- Created At Column -->
           <ng-container matColumnDef="createdAt">
             <th mat-header-cell *matHeaderCellDef
               class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
@@ -310,7 +297,31 @@
                   <mat-icon>visibility</mat-icon>
                   <span>Ver Detalle</span>
                 </button>
-                <!-- Otros botones de acción aquí -->
+                @if([NotificationStatus.PROCESSING, NotificationStatus.COMPLETED, NotificationStatus.SENT, NotificationStatus.CANCELLED].includes(row.status)){
+                <button mat-menu-item (click)="onEdit(row.id)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Editar</span>
+                </button>
+                }
+                
+                @if([NotificationStatus.SCHEDULED, NotificationStatus.DRAFT].includes(row.status) ){
+                <button mat-menu-item (click)="onSend(row.id)">
+                  <mat-icon>send</mat-icon>
+                  <span>Enviar Ahora</span>
+                </button>
+                }
+                
+                @if([NotificationStatus.SCHEDULED, NotificationStatus.DRAFT].includes(row.status)){
+                <button mat-menu-item (click)="onCancel(row.id)">
+                  <mat-icon>cancel</mat-icon>
+                  <span>Cancelar</span>
+                </button>
+                }
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="onDelete(row.id)" class="!text-red-600">
+                  <mat-icon class="!text-red-600">delete</mat-icon>
+                  <span>Eliminar</span>
+                </button>
               </mat-menu>
             </td>
           </ng-container>
@@ -319,7 +330,6 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"
             class="hover:bg-slate-50/70 transition-all duration-200 border-b border-slate-100 last:border-0 cursor-pointer"></tr>
 
-          <!-- No Data Row -->
           <tr class="mat-row" *matNoDataRow>
             <td class="mat-cell text-center py-16" colspan="8">
               <div
@@ -337,7 +347,6 @@
         </table>
       </div>
 
-      <!-- Paginator -->
       <mat-paginator
         class="border-t border-slate-100 ! bg-slate-50/50"
         [length]="totalItems()"

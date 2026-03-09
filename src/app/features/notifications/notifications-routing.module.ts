@@ -5,6 +5,7 @@ import { ScheduleNotificationPageComponent } from "./pages/schedule-notification
 import { ImmediateNotificationPageComponent } from "./pages/immediate-notification-page/immediate-notification-page.component";
 import { CreateNotificationPageComponent } from "./pages/create-notification-page/create-notification-page.component";
 import { ScheduledNotificationDetailPageComponent } from "./pages/scheduled-notification-detail-page/scheduled-notification-detail-page.component";
+import { EditNotificationPageComponent } from "./pages/edit-notification-page/edit-notification-page.component";
 
 const routes: Routes = [
     {
@@ -17,6 +18,10 @@ const routes: Routes = [
                     {
                         path: '',
                         component: ScheduleNotificationPageComponent
+                    },
+                    {
+                        path: ':id/edit',
+                        component: EditNotificationPageComponent
                     },
                     {
                         path: ':id',

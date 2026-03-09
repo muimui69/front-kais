@@ -1,12 +1,15 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationService } from '../../services/notification.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ScheduledNotificationWithCreator } from '../../interfaces/notification.interface';
+import { ScheduledNotificationWithCreator, UpdateScheduledNotificationDTO } from '../../interfaces/notification.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { NotificationStatus, NotificationStatusLabels } from '../../../../shared/enums/notification-status-enum/notification-status.enum';
 import { NotificationType, NotificationTypeLabels } from '../../../../shared/enums/notification-type-enum/notification-type.enum';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogComponent } from '../../../../shared/dialog/dialog.component';
 
 @Component({
   selector: 'app-schedule-notification-page',
@@ -17,8 +20,11 @@ import { Router } from '@angular/router';
 export class ScheduleNotificationPageComponent implements OnInit {
 
   private notificationService = inject(NotificationService);
-  private fb = inject(FormBuilder);
+  private formBuilder = inject(FormBuilder);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
+  public Dialog = new DialogComponent(this.dialog);
+  public NotificationStatus = NotificationStatus;
 
 
   displayedColumns: string[] = ['id', 'title', 'body', 'type', 'status', 'scheduledAt', 'createdBy', 'createdAt', 'actions'];
@@ -52,7 +58,7 @@ export class ScheduleNotificationPageComponent implements OnInit {
   filterForm: FormGroup;
 
   constructor() {
-    this.filterForm = this.fb.group({
+    this.filterForm = this.formBuilder.group({
       startDate: [null],
       endDate: [null],
       type: [''],
@@ -123,6 +129,61 @@ export class ScheduleNotificationPageComponent implements OnInit {
 
   onCreateNew() {
     this.router.navigate(['/notifications/create']);
+  }
+
+  onEdit(id: string) {
+    this.router.navigate(['/notifications/scheduled', id, 'edit']);
+  }
+
+  onDelete(id: string) {
+    this.Dialog.openDialogQuestion('¿Estás seguro de que deseas eliminar esta notificación?', 'Confirmar eliminación').afterClosed().subscribe((result) => {
+      if (result) {
+        this.notificationService.delete(id).subscribe({
+          next: (res) => {
+            this.Dialog.openDialogSuccess(res.message, 'Notificación eliminada');
+            this.loadLogs();
+          },
+          error: (err) => {
+            console.error('Error al eliminar:', err);
+            this.Dialog.openDialogError(err.message, 'Error al eliminar la notificación');
+          }
+        });
+      }
+    });
+  }
+
+  onSend(id: string) {
+    this.Dialog.openDialogQuestion('¿Estás seguro de que deseas enviar esta notificación ahora?', 'Confirmar envío').afterClosed().subscribe((result) => {
+      if (result) {
+        this.notificationService.send(id).subscribe({
+          next: (res) => {
+            this.Dialog.openDialogSuccess(res.message, 'Notificación enviada');
+            this.loadLogs();
+          },
+          error: (err) => {
+            console.error('Error al enviar:', err);
+            this.Dialog.openDialogError(err.message, 'Error al enviar la notificación');
+          }
+        });
+      }
+    });
+  }
+
+  onCancel(id: string) {
+    this.Dialog.openDialogQuestion('¿Estás seguro de que deseas cancelar esta notificación?', 'Confirmar cancelación').afterClosed().subscribe((result) => {
+      if (result) {
+        this.notificationService.cancel(id).subscribe({
+          next: (res) => {
+            this.Dialog.openDialogSuccess(res.message, 'Notificación cancelada');
+            this.loadLogs();
+          },
+          error: (err) => {
+            console.error('Error al cancelar:', err);
+            this.Dialog.openDialogError(err.message, 'Error al cancelar la notificación');
+          }
+        });
+      }
+    });
   }
 
 }

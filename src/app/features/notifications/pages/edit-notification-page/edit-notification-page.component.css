@@ -1,0 +1,20 @@
+/* Custom styles for Guardar Cambios button */
+.save-notification-button {
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2), 0 4px 6px rgba(30, 58, 138, 0.15);
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.save-notification-button:hover {
+    box-shadow: 0 4px 8px rgba(30, 58, 138, 0.3), 0 6px 10px rgba(30, 58, 138, 0.25);
+}
+
+.save-notification-button:disabled {
+    background-color: #cbd5e1;
+    color: #94a3b8;
+    box-shadow: none;
+}

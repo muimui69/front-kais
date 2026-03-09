@@ -5,22 +5,13 @@ import { UserTypeApp } from '../../../shared/enums/user-type-enum/user-type.enum
 
 export { NotificationType } from '../../../shared/enums/notification-type-enum/notification-type.enum';
 
-// ──────────────────────────────────────────────
-// 📦  Generic API Response
-// ──────────────────────────────────────────────
-
 export interface ApiResponse<T> {
     success: boolean;
     message: string;
     data: T;
 }
 
-/** Respuesta simple sin payload (delete, send, cancel) */
 export type SimpleApiResponse = Pick<ApiResponse<never>, 'success' | 'message'>;
-
-// ──────────────────────────────────────────────
-// 📨  Delivery Log
-// ──────────────────────────────────────────────
 
 export enum DeliveryLogStatus {
     SUCCESS = 'SUCCESS',
@@ -40,10 +31,6 @@ export interface DeliveryLog {
     sentAt: Date;
 }
 
-// ──────────────────────────────────────────────
-// 🎯  Criteria Filters (para recipients tipo CRITERIA)
-// ──────────────────────────────────────────────
-
 export interface CriteriaFiltersDTO {
     userType?: UserTypeApp;
     categoryIds?: string[];
@@ -54,10 +41,6 @@ export interface CriteriaFiltersDTO {
     // registeredBefore?: string;
 }
 
-// ──────────────────────────────────────────────
-// 👥  Notification Recipient
-// ──────────────────────────────────────────────
-
 export interface NotificationRecipientDTO {
     recipientType: RecipientType;
     topicName?: string;
@@ -65,10 +48,6 @@ export interface NotificationRecipientDTO {
     criteriaFilters?: CriteriaFiltersDTO;
     description?: string;
 }
-
-// ──────────────────────────────────────────────
-// ✏️  DTOs — Create & Update
-// ──────────────────────────────────────────────
 
 export interface CreateScheduledNotificationDTO {
     title: string;
@@ -87,11 +66,6 @@ export interface UpdateScheduledNotificationDTO {
     recipients?: NotificationRecipientDTO[];
 }
 
-// ──────────────────────────────────────────────
-// 📄  Entidad base — ScheduledNotification
-// ──────────────────────────────────────────────
-
-/** Representa una notificación programada tal cual viene del backend */
 export interface ScheduledNotification {
     id: string;
     title: string;
@@ -111,11 +85,7 @@ export interface ScheduledNotification {
     updatedAt: Date;
 }
 
-// ──────────────────────────────────────────────
-// 📋  Respuestas compuestas (list / detail)
-// ──────────────────────────────────────────────
 
-/** Notificación con info del admin que la creó (listado) */
 export interface ScheduledNotificationWithCreator extends ScheduledNotification {
     createdBy: {
         id: number;
@@ -125,21 +95,6 @@ export interface ScheduledNotificationWithCreator extends ScheduledNotification 
     };
 }
 
-/** Notificación con delivery logs (detalle por ID) */
 export interface ScheduledNotificationDetail extends ScheduledNotificationWithCreator {
     deliveryLogs: DeliveryLog[];
 }
-
-// ──────────────────────────────────────────────
-// 🔄  Aliases de retrocompatibilidad
-// ──────────────────────────────────────────────
-// TODO: migrar consumidores y eliminar estos aliases
-
-/** @deprecated usar ScheduledNotification */
-export type CreateScheduledNotification = ScheduledNotification;
-
-/** @deprecated usar ScheduledNotificationWithCreator */
-export type ScheduledNotifications = ScheduledNotificationWithCreator;
-
-/** @deprecated usar ScheduledNotificationDetail */
-export type ScheduledNotificationsById = ScheduledNotificationDetail;
