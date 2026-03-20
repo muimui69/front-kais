@@ -212,6 +212,6 @@ export class AdManagerComponent implements OnInit {
   }
 
   urlImagen(ad: Advertisement): string {
-    return `${environment.imgUrl}${ad.imageUrl}`;
+    return ad.imageUrl
   }
 }
