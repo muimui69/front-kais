@@ -35,12 +35,12 @@ export class AuthService {
       tap(response => {
 
         if (response.success && response.data) {
-           const { accessToken, admin } = response.data;
-           const user = admin.user;
+          const { accessToken, admin } = response.data;
+          const user = admin.user;
 
-           this.setAccessToken(accessToken);
-           this.currentUserSubject.next(user);
-           this.saveUserToSession(user);
+          this.setAccessToken(accessToken);
+          this.currentUserSubject.next(user);
+          this.saveUserToSession(user);
         }
       })
     );
@@ -53,15 +53,15 @@ export class AuthService {
       { withCredentials: true }
     ).pipe(
       tap(response => {
-         if(response.data) {
-            this.setAccessToken(response.data.accessToken);
+        if (response.data) {
+          this.setAccessToken(response.data.accessToken);
 
-         }
+        }
       })
     );
   }
 
- refreshToken(): Observable<RefreshResponse> {
+  refreshToken(): Observable<RefreshResponse> {
     return this.http.post<RefreshResponse>(
       `${this.baseUrl}/admin-auth/refresh`,
       {},
@@ -77,7 +77,7 @@ export class AuthService {
 
   logout(): void {
     this.http.post(
-     `${this.baseUrl}/admin-auth/logout`,
+      `${this.baseUrl}/admin-auth/logout`,
       {},
       { withCredentials: true }
     ).subscribe({

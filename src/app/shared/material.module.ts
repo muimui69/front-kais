@@ -38,6 +38,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CreditBalanceCardComponent } from './components/credit-balance-card/credit-balance-card.component';
+import { MatTimepickerModule } from '@angular/material/timepicker';
 
 @NgModule({
   imports: [
@@ -78,7 +79,8 @@ import { CreditBalanceCardComponent } from './components/credit-balance-card/cre
     MatSliderModule,
     MatRippleModule,
     MatDividerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatTimepickerModule,
   ],
   exports: [
     MatAutocompleteModule,
@@ -118,6 +120,7 @@ import { CreditBalanceCardComponent } from './components/credit-balance-card/cre
     MatRippleModule,
     MatDividerModule,
     ReactiveFormsModule,
+    MatTimepickerModule,
     CreditBalanceCardComponent
   ],
   declarations: [

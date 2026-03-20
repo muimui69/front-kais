@@ -1,0 +1,362 @@
+<div
+  class="min-h-screen bg-gradient-to-br from-slate-50 via-slate-50 to-slate-100 p-4 md:p-8 font-sans">
+  <div class="max-w-7xl mx-auto space-y-6">
+
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <h1
+          class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Notificaciones Programadas
+        </h1>
+        <p class="text-slate-500 text-sm md:text-base flex items-center gap-2">
+          Notificaciones programadas para eventos futuros. Revisa el historial
+          relacionados con las notificaciones programadas.
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200/80 backdrop-blur-sm">
+
+      <div
+        class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-indigo-50 rounded-lg shrink-0">
+            <mat-icon
+              class="!w-5 !h-5 text-[20px] text-indigo-600">tune</mat-icon>
+          </div>
+          <div>
+            <h3
+              class="text-sm font-bold uppercase tracking-wider text-slate-700">Filtros
+              de Búsqueda</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Refina los resultados según
+              tus criterios</p>
+          </div>
+        </div>
+
+        <button mat-flat-button color="primary"
+          class="w-full sm:w-auto !rounded-lg !px-6 !py-2 !min-h-[44px] shadow-md shadow-indigo-200 flex items-center justify-center"
+          (click)="onCreateNew()">
+          <mat-icon class="mr-1">add</mat-icon>
+          Crear Notificación
+        </button>
+      </div>
+
+      <form [formGroup]="filterForm">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+
+          <div class="md:col-span-3">
+            <label
+              class="block text-sm font-semibold text-slate-700 mb-2.5 ml-1">
+              Estado
+            </label>
+            <mat-form-field appearance="outline"
+              class="w-full no-bottom-space custom-input">
+              <mat-select formControlName="status" placeholder="Todos">
+                <mat-option value>Todos</mat-option>
+                <mat-option *ngFor="let s of statusNotification"
+                  [value]="s.value">{{ s.label }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="md:col-span-3">
+            <label
+              class="block text-sm font-semibold text-slate-700 mb-2.5 ml-1">
+              Tipo
+            </label>
+            <mat-form-field appearance="outline"
+              class="w-full no-bottom-space custom-input">
+              <mat-select formControlName="type" placeholder="Todos">
+                <mat-option value>Todos</mat-option>
+                <mat-option *ngFor="let t of typesNotification"
+                  [value]="t.value">{{ t.label }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="md:col-span-4">
+            <label
+              class="block text-sm font-semibold text-slate-700 mb-2.5 ml-1">
+              Periodo de Tiempo
+            </label>
+            <mat-form-field appearance="outline"
+              class="w-full no-bottom-space custom-input">
+              <mat-icon matPrefix
+                class="text-slate-400 mr-2">date_range</mat-icon>
+
+              <mat-date-range-input [rangePicker]="picker">
+                <input matStartDate
+                  formControlName="startDate"
+                  placeholder="Desde"
+                  class="!text-slate-900 placeholder:! text-slate-400">
+
+                <input matEndDate
+                  formControlName="endDate"
+                  placeholder="Hasta"
+                  class="!text-slate-900 placeholder:!text-slate-400">
+              </mat-date-range-input>
+
+              <mat-datepicker-toggle matSuffix [for]="picker"
+                class="text-slate-400"></mat-datepicker-toggle>
+              <mat-date-range-picker #picker></mat-date-range-picker>
+            </mat-form-field>
+          </div>
+
+          <div class="md:col-span-2 flex justify-end">
+            <button mat-stroked-button color="warn"
+              class="w-full md:w-auto !rounded-xl !h-[44px] !border-red-200 !text-red-600 hover:!bg-red-50"
+              (click)="filterForm.reset()">
+              <mat-icon class="mr-1">restart_alt</mat-icon>
+              Restablecer
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+
+    <div
+      class="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200/80 overflow-hidden relative backdrop-blur-sm">
+
+      @if(loading()) {
+      <div
+        class="absolute inset-0 bg-white/90 z-20 flex items-center justify-center backdrop-blur-md">
+        <div class="flex flex-col items-center gap-4">
+          <mat-spinner diameter="48" class="custom-spinner"></mat-spinner>
+          <div class="text-center">
+            <span class="text-sm font-semibold text-slate-700 block">Cargando
+              registros...</span>
+            <span class="text-xs text-slate-400 mt-1">Por favor espera un
+              momento</span>
+          </div>
+        </div>
+      </div>
+      }
+
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="dataSource" class="w-full">
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef
+              class="!pl-8 !font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
+              ID
+            </th>
+            <td mat-cell *matCellDef="let element" class="!pl-8">
+              <span
+                class="font-mono text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                #{{element.id | slice:0:8}}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef
+              class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
+              Título
+            </th>
+            <td mat-cell *matCellDef="let element" class="max-w-xs">
+              <p class="text-slate-800 text-sm font-semibold line-clamp-1"
+                [title]="element.title">
+                {{element.title}}
+              </p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="body">
+            <th mat-header-cell *matHeaderCellDef
+              class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
+              Mensaje
+            </th>
+            <td mat-cell *matCellDef="let element" class="max-w-xs">
+              <p class="text-slate-600 text-sm line-clamp-2 leading-relaxed"
+                [title]="element.body">
+                {{element.body}}
+              </p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef
+              class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
+              Tipo
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <span
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wide border uppercase shadow-sm"
+                [ngClass]="{
+                  'bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-amber-200': element.type === 'SCHEDULED',
+                  'bg-gradient-to-r from-cyan-50 to-cyan-100 text-cyan-700 border-cyan-200': element.type === 'IMMEDIATE'
+                }">
+                <span class="w-1.5 h-1.5 rounded-full"
+                  [ngClass]="{
+                    'bg-amber-500': element.type === 'SCHEDULED',
+                    'bg-cyan-500': element.type === 'IMMEDIATE'
+                  }">
+                </span>
+                {{ getTypeLabel(element.type) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef
+              class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
+              Estado
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <span
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wide border uppercase shadow-sm"
+                [ngClass]="{
+                  'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-blue-200': element.status === 'SCHEDULED',
+                  'bg-gradient-to-r from-green-50 to-green-100 text-green-700 border-green-200': element.status === 'COMPLETED' || element.status === 'SENT',
+                  'bg-gradient-to-r from-red-50 to-red-100 text-red-700 border-red-200': element.status === 'FAILED' || element.status === 'CANCELLED',
+                  'bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-700 border-yellow-200': element.status === 'PROCESSING',
+                  'bg-gradient-to-r from-slate-50 to-slate-100 text-slate-700 border-slate-200': element.status === 'DRAFT'
+                }">
+                <span class="w-1.5 h-1.5 rounded-full"
+                  [ngClass]="{
+                    'bg-blue-500': element.status === 'SCHEDULED',
+                    'bg-green-500': element.status === 'COMPLETED' || element.status === 'SENT',
+                    'bg-red-500': element.status === 'FAILED' || element.status === 'CANCELLED',
+                    'bg-yellow-500': element.status === 'PROCESSING',
+                    'bg-slate-500': element.status === 'DRAFT'
+                  }">
+                </span>
+                {{ getStatusLabel(element.status) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="scheduledAt">
+            <th mat-header-cell *matHeaderCellDef
+              class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
+              Programada
+            </th>
+            <td mat-cell *matCellDef="let element">
+              @if (element.scheduledAt) {
+              <div class="flex flex-col gap-0.5">
+                <span class="text-slate-700 text-sm font-semibold">
+                  {{ element.scheduledAt | date:'mediumDate' }}
+                </span>
+                <span class="text-slate-500 text-xs">
+                  {{ element.scheduledAt | date:'shortTime' }}
+                </span>
+              </div>
+              } @else {
+              <span class="text-slate-400 text-xs italic">Inmediata</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdBy">
+            <th mat-header-cell *matHeaderCellDef
+              class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
+              Creado por
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="flex items-center gap-3 py-3">
+                <div
+                  class="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-100 to-indigo-200 border border-white shadow-sm flex items-center justify-center text-xs font-bold text-indigo-700">
+                  {{ element.createdBy?.id || '?' }}
+                </div>
+                <span class="text-slate-700 text-sm font-medium">
+                  Admin #{{ element.created_by_admin_id }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef
+              class="!font-bold !text-xs !uppercase !tracking-wider !text-slate-600 !bg-slate-50/80">
+              Fecha Creación
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="flex flex-col gap-0.5">
+                <span class="text-slate-700 text-sm font-semibold">
+                  {{ element.createdAt | date:'mediumDate' }}
+                </span>
+                <span class="text-slate-500 text-xs">
+                  {{ element.createdAt | date:'shortTime' }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="!pr-8"></th>
+            <td mat-cell *matCellDef="let row" class="!pr-8">
+              <button mat-icon-button [matMenuTriggerFor]="menu"
+                aria-label="Acciones">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="onViewDetail(row.id)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>Ver Detalle</span>
+                </button>
+                @if([NotificationStatus.PROCESSING, NotificationStatus.COMPLETED, NotificationStatus.SENT, NotificationStatus.CANCELLED].includes(row.status)){
+                <button mat-menu-item (click)="onEdit(row.id)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Editar</span>
+                </button>
+                }
+                
+                @if([NotificationStatus.SCHEDULED, NotificationStatus.DRAFT].includes(row.status) ){
+                <button mat-menu-item (click)="onSend(row.id)">
+                  <mat-icon>send</mat-icon>
+                  <span>Enviar Ahora</span>
+                </button>
+                }
+                
+                @if([NotificationStatus.SCHEDULED, NotificationStatus.DRAFT].includes(row.status)){
+                <button mat-menu-item (click)="onCancel(row.id)">
+                  <mat-icon>cancel</mat-icon>
+                  <span>Cancelar</span>
+                </button>
+                }
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="onDelete(row.id)" class="!text-red-600">
+                  <mat-icon class="!text-red-600">delete</mat-icon>
+                  <span>Eliminar</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"
+            class="!h-14"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            class="hover:bg-slate-50/70 transition-all duration-200 border-b border-slate-100 last:border-0 cursor-pointer"></tr>
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell text-center py-16" colspan="8">
+              <div
+                class="flex flex-col items-center justify-center text-slate-400">
+                <div class="p-4 bg-slate-100 rounded-full mb-4">
+                  <mat-icon class="text-5xl !h-12 !w-12">search_off</mat-icon>
+                </div>
+                <p class="text-lg font-semibold text-slate-600">No se
+                  encontraron registros</p>
+                <p class="text-sm text-slate-400 mt-1">Intenta ajustar los
+                  filtros de búsqueda</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator
+        class="border-t border-slate-100 ! bg-slate-50/50"
+        [length]="totalItems()"
+        [pageSize]="pageSize()"
+        [pageIndex]="pageIndex()"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+
+  </div>
+</div>

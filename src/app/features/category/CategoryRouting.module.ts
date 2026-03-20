@@ -19,23 +19,23 @@ const routes: Routes = [
                 }
             },
             {
-              path: 'category/create',
-              component: CategoryFormComponent
+                path: 'category/create',
+                component: CategoryFormComponent
             },
             {
-              path: 'category/edit/:id',
-              component: CategoryFormComponent
+                path: 'category/edit/:id',
+                component: CategoryFormComponent
             },
             {
                 path: 'category/view/:id',
                 component: CategoryDetailsComponent
             },
             {
-              path: 'category/:parentId',
-              component: CategoryBrowserComponent,
-              data: {
-                  roles: []
-              }
+                path: 'category/:parentId',
+                component: CategoryBrowserComponent,
+                data: {
+                    roles: []
+                }
             }
         ]
     }
@@ -44,7 +44,7 @@ const routes: Routes = [
 
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule]
 })
 export class CategoryRoutingModule { }

@@ -104,12 +104,6 @@ export const menuItem = [
     ]
   },
   {
-    name: Menu.NOTIFICACIONES,
-    icon: 'notifications',
-    router: '/notificaciones',
-    items: []
-  },
-  {
     name: Menu.CONFIGURACION,
     icon: 'settings',
     router: '/configuracion',
@@ -167,7 +161,23 @@ export const menuItem = [
         icon: 'people',
         router: '/referrals',
       }*/
-
+    ],
+  },
+  {
+    name: Menu.NOTIFICACIONES,
+    icon: 'notifications',
+    router: '',
+    items: [
+      {
+        name: 'Programar Notificación',
+        icon: 'timer',
+        router: '/notifications/scheduled',
+      },
+      // {
+      //   name: 'Enviar Notificación',
+      //   icon: 'send',
+      //   router: '/notifications/immediate',
+      // }
     ]
   },
 
