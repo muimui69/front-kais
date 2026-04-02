@@ -27,7 +27,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/farmacia_kais",
+            "outputPath": "dist/panel-tebusco",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [

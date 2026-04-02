@@ -23,7 +23,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copiamos los archivos compilados desde la Etapa 1
 # OJO: En Angular nuevo (v17+), la carpeta build está dentro de "/browser"
-COPY --from=build /app/dist/front-tebusco/browser /usr/share/nginx/html
+COPY --from=build /app/dist/panel-tebusco/browser /usr/share/nginx/html
 
 # Exponemos el puerto 80
 EXPOSE 80
