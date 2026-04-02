@@ -1,0 +1,72 @@
+<div class="p-8 bg-gray-50 min-h-screen">
+
+  <!-- Back + Title -->
+  <div class="mb-8">
+    <button mat-stroked-button (click)="cancel()" class="mb-4">
+      <mat-icon>arrow_back</mat-icon>
+      Volver a planes
+    </button>
+    <h1 class="text-2xl font-semibold text-gray-800">Nuevo Plan de Suscripción</h1>
+    <p class="text-gray-500 text-sm mt-1">
+      Completa los datos básicos. Podrás agregar intervalos de cobro y características después de crear el plan.
+    </p>
+  </div>
+
+  <!-- Form card -->
+  <div class="max-w-xl bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+    <form [formGroup]="form" (ngSubmit)="save()" class="flex flex-col gap-5">
+
+      <!-- Código -->
+      <div>
+        <label class="field-label">Código del plan *</label>
+        <input formControlName="code"
+               placeholder="Ej: PRO, BASIC, ENTERPRISE"
+               class="field-input"
+               [class.border-red-400]="form.get('code')?.invalid && form.get('code')?.touched">
+        <p class="field-hint">Se guardará en MAYÚSCULAS. No puede modificarse después.</p>
+        @if (form.get('code')?.hasError('required') && form.get('code')?.touched) {
+          <p class="field-error">El código es requerido</p>
+        }
+        @if (form.get('code')?.hasError('serverError')) {
+          <p class="field-error">{{ form.get('code')?.getError('serverError') }}</p>
+        }
+      </div>
+
+      <!-- Nombre -->
+      <div>
+        <label class="field-label">Nombre del plan *</label>
+        <input formControlName="name"
+               placeholder="Ej: Plan Profesional"
+               class="field-input"
+               [class.border-red-400]="form.get('name')?.invalid && form.get('name')?.touched">
+        @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+          <p class="field-error">El nombre es requerido</p>
+        }
+      </div>
+
+      <!-- Descripción -->
+      <div>
+        <label class="field-label">
+          Descripción <span class="text-gray-400 font-normal normal-case">(opcional)</span>
+        </label>
+        <textarea formControlName="description"
+                  rows="3"
+                  class="field-input resize-none"
+                  placeholder="Describe brevemente este plan..."></textarea>
+      </div>
+
+      <!-- Acciones -->
+      <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+        <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || isLoading">
+          @if (isLoading) {
+            <mat-spinner diameter="20" class="inline mr-2"></mat-spinner>
+          }
+          Crear Plan
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

@@ -1,0 +1,18 @@
+::ng-deep .custom-accordion .mat-expansion-panel-header {
+  height: 64px !important;
+}
+
+::ng-deep .custom-accordion .mat-expansion-panel-body {
+  padding: 0 !important;
+}
+
+::ng-deep .action-checkbox .mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .action-checkbox .mdc-label {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

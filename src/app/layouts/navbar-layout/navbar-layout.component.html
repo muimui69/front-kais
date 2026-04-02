@@ -17,7 +17,7 @@
 
     <!-- Navegación -->
     <nav class="sidebar-nav">
-      @for (nav of fillerNav; track nav) {
+      @for (nav of filteredNav; track nav) {
 
         @if (! nav.items || nav.items. length === 0) {
           <a

@@ -50,7 +50,7 @@ export class AuthLoginFormComponent {
       next: (response) => {
         console.log('Login exitoso:', response);
         this.storageService.saveAdminToLocalStorage(response.data.admin);
-        const user = response.data.admin.user;
+        const user = response.data.admin;
 
         this.Dialog.openDialogSuccess(
           `Bienvenido ${user.name}`,

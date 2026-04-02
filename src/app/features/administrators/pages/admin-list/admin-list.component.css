@@ -1,0 +1,82 @@
+::ng-deep .mat-mdc-header-cell {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: rgb(156 163 175) !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid rgb(243 244 246) !important;
+  background-color: white !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+::ng-deep .mat-mdc-cell {
+  font-size: 0.875rem !important;
+  color: rgb(75 85 99) !important;
+  border-bottom: 1px solid rgb(249 250 251) !important;
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+::ng-deep .mat-mdc-row {
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+::ng-deep .mat-mdc-row:hover {
+  background-color: rgba(249, 250, 251, 0.8);
+}
+
+.mat-mdc-table {
+  background: transparent !important;
+}
+
+/* Status chips */
+.status-chip {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  text-align: center;
+  min-width: 72px;
+}
+
+.status-chip-active {
+  background-color: rgb(220 252 231);
+  color: rgb(21 128 61);
+}
+
+.status-chip-inactive {
+  background-color: rgb(243 244 246);
+  color: rgb(107 114 128);
+}
+
+/* Role chip */
+.role-chip {
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  background-color: rgb(219 234 254);
+  color: rgb(29 78 216);
+}
+
+/* Action buttons */
+.action-button { color: #6b7280; }
+.action-button:hover { color: #374151; background: #f3f4f6; }
+.action-button-danger { color: #ef4444; }
+.action-button-danger:hover { background: #fef2f2; }
+
+/* Paginator */
+::ng-deep .mat-mdc-paginator {
+  background: white !important;
+  font-size: 12px !important;
+  color: rgb(107 114 128) !important;
+}

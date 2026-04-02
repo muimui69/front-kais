@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { tap, map, catchError } from 'rxjs/operators';
 import { environment } from '../../../../environment/environment';
 import { LoginResponse, RefreshResponse, User } from '../interfaces/auth.inteface';
 
@@ -25,7 +25,6 @@ export class AuthService {
     this.loadUserFromSession();
   }
 
-
   loginPanel(username: string, password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(
       `${this.baseUrl}/admin-auth/login`,
@@ -33,11 +32,21 @@ export class AuthService {
       { withCredentials: true }
     ).pipe(
       tap(response => {
-
         if (response.success && response.data) {
           const { accessToken, admin } = response.data;
-          const user = admin.user;
-
+          const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
+          const user: User = {
+            id: admin.id,
+            name: admin.name,
+            lastName: admin.lastName,
+            email: admin.email,
+            username: admin.username,
+            phone: admin.phone,
+            photoUrl: admin.photoUrl,
+            role: admin.role!,
+            fullName: admin.fullName ?? `${admin.name} ${admin.lastName}`,
+            permissions: tokenPayload.permissions ?? []
+          };
           this.setAccessToken(accessToken);
           this.currentUserSubject.next(user);
           this.saveUserToSession(user);
@@ -55,7 +64,6 @@ export class AuthService {
       tap(response => {
         if (response.data) {
           this.setAccessToken(response.data.accessToken);
-
         }
       })
     );
@@ -71,6 +79,27 @@ export class AuthService {
         if (response.success && response.data) {
           this.setAccessToken(response.data.accessToken);
         }
+      })
+    );
+  }
+
+  verifySession(): Observable<boolean> {
+    console.log('Verifying session...');
+    return this.http.get<any>(
+      `${this.baseUrl}/admin-auth/me`,
+      { withCredentials: true }
+    ).pipe(
+      tap(response => {
+        if (response && response.data) {
+          console.log('response', response)
+          this.currentUserSubject.next(response.data);
+          this.saveUserToSession(response.data);
+        }
+      }),
+      map(() => true),
+      catchError(() => {
+        this.clearSession();
+        return of(false);
       })
     );
   }
@@ -105,35 +134,27 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.accessTokenSubject.value;
+    return !!this.currentUserSubject.value;
   }
 
-  // NOTA: En tu JSON 'permissions' venía como null.
-  // Asegúrate de manejar eso en la interfaz User (permissions?: Permission[])
   hasPermission(permissionName: string): boolean {
     const user = this.currentUserSubject.value;
-    // @ts-ignore: Si permissions no está en la interfaz User, esto marcará error.
     if (!user || !user.permissions) return false;
-    // @ts-ignore
     return user.permissions.some(p => p.name === permissionName);
   }
 
   hasAnyPermission(permissionNames: string[]): boolean {
     const user = this.currentUserSubject.value;
-    // @ts-ignore
     if (!user || !user.permissions) return false;
     return permissionNames.some(name =>
-      // @ts-ignore
       user.permissions.some(p => p.name === name)
     );
   }
 
   hasAllPermissions(permissionNames: string[]): boolean {
     const user = this.currentUserSubject.value;
-    // @ts-ignore
     if (!user || !user.permissions) return false;
     return permissionNames.every(name =>
-      // @ts-ignore
       user.permissions.some(p => p.name === name)
     );
   }
@@ -153,7 +174,6 @@ export class AuthService {
       try {
         this.currentUserSubject.next(JSON.parse(userStr));
       } catch (e) {
-        console.error('Error loading user from session:', e);
         sessionStorage.removeItem('user');
       }
     }

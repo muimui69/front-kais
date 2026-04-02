@@ -9,6 +9,7 @@ export enum Menu {
   SOLICITUDES_SERVICIO = 'Solicitudes de Servicio',
   SUSCRIPCIONES_PAGOS = 'Suscripciones y Pagos',
   NOTIFICACIONES = 'Notificaciones',
+  PLANES_PROFESIONALES = 'Planes de Suscripción',
   CONFIGURACION = 'Configuración',
   SOPORTE = 'Soporte',
 }

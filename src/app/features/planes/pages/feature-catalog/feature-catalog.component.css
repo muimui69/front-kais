@@ -1,0 +1,50 @@
+::ng-deep .mat-mdc-header-cell {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: rgb(156 163 175) !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid rgb(243 244 246) !important;
+  background-color: white !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+::ng-deep .mat-mdc-cell {
+  font-size: 0.875rem !important;
+  color: rgb(75 85 99) !important;
+  border-bottom: 1px solid rgb(249 250 251) !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+::ng-deep .mat-mdc-row {
+  transition: background-color 200ms;
+}
+
+.mat-mdc-table {
+  background: transparent !important;
+}
+
+.status-chip {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  text-align: center;
+}
+
+.chip-active   { background-color: #d1fae5; color: #065f46; }
+.chip-inactive { background-color: #f3f4f6; color: #6b7280; }
+
+.action-button {
+  color: rgb(156 163 175) !important;
+  transition: color 150ms;
+}
+
+.action-button:hover {
+  color: rgb(75 85 99) !important;
+}

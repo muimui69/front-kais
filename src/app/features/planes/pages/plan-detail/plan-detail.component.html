@@ -1,0 +1,178 @@
+<div class="p-8 bg-gray-50 min-h-screen">
+
+  @if (loading()) {
+    <div class="flex justify-center py-20">
+      <mat-spinner diameter="52"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading()) {
+    @if (plan(); as p) {
+
+      <!-- Top bar -->
+      <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+        <button mat-stroked-button (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+          Volver a planes
+        </button>
+        <div class="flex gap-2">
+          <button mat-stroked-button (click)="openEditPlanDialog()">
+            <mat-icon>edit</mat-icon>
+            Editar
+          </button>
+          <button mat-flat-button [color]="p.status === 'active' ? 'warn' : 'primary'" (click)="togglePlanStatus()">
+            <mat-icon>{{ p.status === 'active' ? 'toggle_off' : 'toggle_on' }}</mat-icon>
+            {{ p.status === 'active' ? 'Desactivar' : 'Activar' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Header card -->
+      <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
+        <div class="flex items-start gap-4 flex-wrap">
+          <div class="p-3 bg-blue-50 rounded-xl">
+            <mat-icon class="text-blue-600" style="font-size:32px;width:32px;height:32px">card_membership</mat-icon>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 flex-wrap mb-1">
+              <h1 class="text-2xl font-bold text-gray-800">{{ p.name }}</h1>
+              <span class="font-mono text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded font-bold">{{ p.code }}</span>
+              <span class="status-chip" [ngClass]="p.status === 'active' ? 'chip-active' : 'chip-inactive'">
+                {{ p.status === 'active' ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+            @if (p.description) {
+              <p class="text-gray-500 text-sm">{{ p.description }}</p>
+            }
+          </div>
+          @if (p.activeSubscriptionCount !== undefined) {
+            <div class="text-right shrink-0">
+              <p class="text-3xl font-bold text-green-700">{{ p.activeSubscriptionCount }}</p>
+              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">suscriptores activos</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Intervalos -->
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-700">Intervalos de cobro</h2>
+        <button mat-flat-button color="primary" (click)="openAddIntervalDialog()">
+          <mat-icon>add</mat-icon>
+          Agregar intervalo
+        </button>
+      </div>
+
+      @if (!p.intervals || p.intervals.length === 0) {
+        <div class="bg-white border border-dashed border-gray-300 rounded-xl flex flex-col items-center py-12 text-gray-400 mb-6">
+          <mat-icon style="font-size:40px;width:40px;height:40px" class="text-gray-300 mb-3">payments</mat-icon>
+          <p class="font-medium">No hay intervalos de cobro.</p>
+          <p class="text-sm mt-1">Agrega uno para comenzar a ofrecer este plan.</p>
+        </div>
+      }
+
+      <mat-accordion multi class="mb-6 flex flex-col gap-3">
+        @for (interval of p.intervals; track interval.id) {
+          <mat-expansion-panel class="!rounded-xl !shadow-sm border border-gray-200 !mb-0">
+
+            <mat-expansion-panel-header class="!py-4">
+              <mat-panel-title class="flex items-center gap-3">
+                <div class="p-1.5 bg-blue-50 rounded-lg shrink-0">
+                  <mat-icon class="text-blue-600" style="font-size:18px;width:18px;height:18px">payments</mat-icon>
+                </div>
+                <span class="font-bold text-gray-800">{{ interval.intervalDisplay }}</span>
+                <span class="text-gray-500 text-sm font-medium hidden sm:inline">
+                  {{ interval.currency }} {{ interval.pricePerPeriod | number:'1.2-2' }} / {{ interval.daysPerPeriod }} días
+                </span>
+              </mat-panel-title>
+              <mat-panel-description class="flex items-center gap-2 justify-end">
+                <span class="status-chip" [ngClass]="interval.isActive ? 'chip-active' : 'chip-inactive'">
+                  {{ interval.isActive ? 'Activo' : 'Inactivo' }}
+                </span>
+                @if (interval.activeSubscriptionCount !== undefined) {
+                  <span class="text-xs font-bold text-gray-400">{{ interval.activeSubscriptionCount }} suscriptor(es)</span>
+                }
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <!-- Info del intervalo -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 rounded-lg p-4 mb-4">
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Código interno</p>
+                <p class="font-mono font-bold text-gray-700 text-xs">{{ interval.interval }}</p>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Moneda</p>
+                <p class="font-bold text-gray-700">{{ interval.currency }}</p>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Precio</p>
+                <p class="font-bold text-gray-700">{{ interval.pricePerPeriod | number:'1.2-2' }}</p>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Días</p>
+                <p class="font-bold text-gray-700">{{ interval.daysPerPeriod }}</p>
+              </div>
+            </div>
+
+            <!-- Acciones del intervalo -->
+            <div class="flex gap-2 mb-5">
+              <button mat-stroked-button (click)="openEditIntervalDialog(interval)">
+                <mat-icon>edit</mat-icon> Editar intervalo
+              </button>
+              <button mat-stroked-button color="warn" (click)="deleteInterval(interval)">
+                <mat-icon>delete</mat-icon> Eliminar
+              </button>
+            </div>
+
+            <!-- Features -->
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Características incluidas</h3>
+              <button mat-stroked-button color="primary" (click)="openAddFeatureDialog(interval)">
+                <mat-icon>add</mat-icon>
+                Agregar característica
+              </button>
+            </div>
+
+            @if (!interval.features || interval.features.length === 0) {
+              <div class="text-center py-6 text-gray-400 border border-dashed border-gray-200 rounded-lg">
+                <p class="text-sm font-medium">Sin características asignadas</p>
+              </div>
+            }
+
+            <div class="flex flex-col gap-2">
+              @for (feat of interval.features; track feat.id) {
+                <div class="flex items-center justify-between bg-white border border-gray-100 rounded-lg px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="p-1.5 bg-gray-100 rounded-md">
+                      <mat-icon class="text-gray-500" style="font-size:16px;width:16px;height:16px">check</mat-icon>
+                    </div>
+                    <div>
+                      <p class="font-bold text-gray-800 text-sm">{{ feat.feature?.displayName ?? feat.featureId }}</p>
+                      <p class="text-xs text-gray-400 font-medium">{{ formatLimit(feat) }}</p>
+                    </div>
+                  </div>
+                  <button mat-icon-button class="action-button-danger"
+                          (click)="removeFeature(feat)"
+                          matTooltip="Quitar característica">
+                    <mat-icon>remove_circle_outline</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+
+          </mat-expansion-panel>
+        }
+      </mat-accordion>
+
+    }
+
+    @if (!plan()) {
+      <div class="flex flex-col items-center py-20 text-gray-400">
+        <mat-icon style="font-size:48px;width:48px;height:48px" class="text-gray-300 mb-4">error_outline</mat-icon>
+        <p class="font-medium">No se pudo cargar el plan.</p>
+      </div>
+    }
+  }
+
+</div>

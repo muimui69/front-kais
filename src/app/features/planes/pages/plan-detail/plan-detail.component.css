@@ -1,0 +1,30 @@
+::ng-deep .mat-expansion-panel {
+  border-radius: 0.75rem !important;
+}
+
+::ng-deep .mat-expansion-panel:last-of-type {
+  border-radius: 0.75rem !important;
+}
+
+.status-chip {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  text-align: center;
+}
+
+.chip-active   { background-color: #d1fae5; color: #065f46; }
+.chip-inactive { background-color: #f3f4f6; color: #6b7280; }
+
+.action-button-danger {
+  color: rgb(209 213 219) !important;
+  transition: color 150ms;
+}
+
+.action-button-danger:hover {
+  color: rgb(239 68 68) !important;
+}

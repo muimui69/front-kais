@@ -55,6 +55,23 @@ const routes: Routes = [
     loadChildren: () => import('../app/features/notifications/notifications.module').then(m => m.NotificationsModule),
   },
   {
+    path: 'professional-documents',
+    loadChildren: () => import('../app/features/professional-documents/professional-documents.module').then(m => m.ProfessionalDocumentsModule),
+  },
+  {
+    path: 'planes',
+    loadChildren: () => import('../app/features/planes/planes.module').then(m => m.PlanesModule),
+  },
+  {
+    path: 'administrators',
+    loadChildren: () => import('../app/features/administrators/administrators.module').then(m => m.AdministratorsModule),
+  },
+
+  {
+    path: 'roles',
+    loadChildren: () => import('../app/features/roles/roles.module').then(m => m.RolesModule),
+  },
+  {
     path: '**',
     redirectTo: 'auth'
   }

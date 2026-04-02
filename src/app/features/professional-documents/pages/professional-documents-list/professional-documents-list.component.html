@@ -1,0 +1,287 @@
+<div class="p-8 bg-gray-50 min-h-screen">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-800">Verificación de Documentos</h1>
+      <p class="text-gray-500 text-sm mt-1">
+        Revisá, aprobá o rechazá los documentos de identidad de los profesionales.
+      </p>
+    </div>
+    @if (stats()) {
+      <div class="flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2">
+        <mat-icon class="text-yellow-600">hourglass_empty</mat-icon>
+        <span class="font-semibold text-yellow-700">{{ stats()!.professionals.pendingVerification }}</span>
+        <span class="text-yellow-600 text-sm">en cola de revisión</span>
+      </div>
+    }
+  </div>
+
+  <!-- Stats Cards -->
+  @if (loadingStats()) {
+    <div class="flex justify-center py-4">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+  @if (!loadingStats() && stats()) {
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <!-- Documentos stats -->
+      <div class="bg-white border border-gray-200 shadow-sm rounded-xl p-4 flex items-center gap-3">
+        <div class="p-2 bg-gray-100 rounded-lg">
+          <mat-icon class="text-gray-600">hourglass_empty</mat-icon>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-gray-800">{{ stats()!.documents.pending }}</p>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Sin archivo</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-blue-200 shadow-sm rounded-xl p-4 flex items-center gap-3">
+        <div class="p-2 bg-blue-50 rounded-lg">
+          <mat-icon class="text-blue-600">upload_file</mat-icon>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-blue-800">{{ stats()!.documents.uploaded }}</p>
+          <p class="text-xs font-medium text-blue-600 uppercase tracking-wide">Por revisar</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-green-200 shadow-sm rounded-xl p-4 flex items-center gap-3">
+        <div class="p-2 bg-green-50 rounded-lg">
+          <mat-icon class="text-green-600">check_circle</mat-icon>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-green-800">{{ stats()!.documents.approved }}</p>
+          <p class="text-xs font-medium text-green-600 uppercase tracking-wide">Aprobados</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-red-200 shadow-sm rounded-xl p-4 flex items-center gap-3">
+        <div class="p-2 bg-red-50 rounded-lg">
+          <mat-icon class="text-red-600">cancel</mat-icon>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-red-800">{{ stats()!.documents.rejected }}</p>
+          <p class="text-xs font-medium text-red-600 uppercase tracking-wide">Rechazados</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profesionales stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="bg-white border border-gray-200 shadow-sm rounded-xl p-5">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Profesionales pendientes</p>
+        <p class="text-3xl font-bold text-gray-800">{{ stats()!.professionals.byStatus.pending }}</p>
+        <p class="text-xs text-gray-400 font-medium mt-1">No subieron todos los docs</p>
+      </div>
+      <div class="bg-white border border-yellow-200 shadow-sm rounded-xl border-l-4 border-l-yellow-400 p-5">
+        <p class="text-[10px] font-bold text-yellow-600 uppercase tracking-widest mb-1">Cola de trabajo</p>
+        <p class="text-3xl font-bold text-yellow-700">{{ stats()!.professionals.byStatus.documents_uploaded }}</p>
+        <p class="text-xs text-yellow-600 font-medium mt-1">Docs subidos, esperando revisión</p>
+      </div>
+      <div class="bg-white border border-green-200 shadow-sm rounded-xl border-l-4 border-l-green-400 p-5">
+        <p class="text-[10px] font-bold text-green-600 uppercase tracking-widest mb-1">Verificados</p>
+        <p class="text-3xl font-bold text-green-700">{{ stats()!.professionals.byStatus.verified }}</p>
+        <p class="text-xs text-green-600 font-medium mt-1">de {{ stats()!.professionals.total }} totales</p>
+      </div>
+    </div>
+  }
+
+  <!-- Filtros -->
+  <form [formGroup]="filterForm" class="bg-white border border-gray-200 rounded-t-xl p-4 flex flex-wrap items-center gap-4">
+    <div class="flex-1 min-w-[200px]">
+      <label class="filter-label">Buscar profesional</label>
+      <div class="relative">
+        <input
+          formControlName="search"
+          placeholder="Nombre o apellido..."
+          class="filter-input"
+        >
+        <mat-icon class="absolute right-3 top-2.5 text-gray-400">search</mat-icon>
+      </div>
+    </div>
+
+    <div class="w-[180px]">
+      <label class="filter-label">Estado del documento</label>
+      <select formControlName="status" class="filter-input">
+        @for (opt of documentStatusOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="w-[180px]">
+      <label class="filter-label">Estado del profesional</label>
+      <select formControlName="professionalStatus" class="filter-input">
+        @for (opt of professionalStatusOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="w-[150px]">
+      <label class="filter-label">Verificación</label>
+      <select formControlName="isVerified" class="filter-input">
+        @for (opt of verifiedOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
+  </form>
+
+  <!-- Tabla -->
+  <div class="bg-white border border-gray-200 border-t-0 rounded-b-xl overflow-hidden shadow-sm">
+    @if (loadingList()) {
+      <div class="flex justify-center py-12">
+        <mat-spinner diameter="48"></mat-spinner>
+      </div>
+    }
+
+    @if (!loadingList()) {
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="dataSource()" class="w-full">
+
+          <!-- Profesional Column -->
+          <ng-container matColumnDef="professional">
+            <th mat-header-cell *matHeaderCellDef class="table-header">Profesional</th>
+            <td mat-cell *matCellDef="let row" class="py-4">
+              <div class="flex items-center gap-3">
+                @if (row.avatarUrl) {
+                  <img [src]="row.avatarUrl" alt="avatar"
+                       class="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm" />
+                } @else {
+                  <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 shadow-sm">
+                    <mat-icon class="text-gray-400">person</mat-icon>
+                  </div>
+                }
+                <div>
+                  <p class="font-bold text-gray-800">{{ row.userName }} {{ row.userLastName }}</p>
+                  <p class="text-xs font-medium text-gray-400">ID: {{ row.professionalId }}</p>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef class="table-header">Contacto</th>
+            <td mat-cell *matCellDef="let row">
+              <p class="text-sm font-medium text-gray-800">{{ row.userEmail }}</p>
+              <p class="text-xs font-medium text-gray-400">{{ row.userPhone }}</p>
+            </td>
+          </ng-container>
+
+          <!-- Categorías Column -->
+          <ng-container matColumnDef="categories">
+            <th mat-header-cell *matHeaderCellDef class="table-header">Categorías</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="flex flex-wrap gap-1">
+                @for (cat of row.categories.slice(0, 2); track cat) {
+                  <span class="text-[10px] bg-gray-100 border border-gray-200 text-gray-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">{{ cat }}</span>
+                }
+                @if (row.categories.length > 2) {
+                  <span class="text-[10px] text-gray-400 font-bold px-1">+{{ row.categories.length - 2 }}</span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Estado profesional Column -->
+          <ng-container matColumnDef="professionalStatus">
+            <th mat-header-cell *matHeaderCellDef class="table-header">Estado</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="flex flex-col gap-1 items-start">
+                <span class="status-chip"
+                      [ngClass]="getProfessionalStatusClass(row.professionalStatus)">
+                  {{ getProfessionalStatusLabel(row.professionalStatus) }}
+                </span>
+                @if (row.isVerified) {
+                  <span class="text-[10px] font-bold text-green-600 flex items-center gap-1 uppercase tracking-wider mt-1">
+                    <mat-icon class="!text-[14px] !h-[14px] !w-[14px]">verified</mat-icon> Verificado
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Resumen documentos Column -->
+          <ng-container matColumnDef="documentSummary">
+            <th mat-header-cell *matHeaderCellDef class="table-header">Documentos</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="flex gap-1.5 flex-wrap">
+                @if (row.documentSummary.uploaded > 0) {
+                  <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-100"
+                        matTooltip="Por revisar">{{ row.documentSummary.uploaded }} ↑</span>
+                }
+                @if (row.documentSummary.approved > 0) {
+                  <span class="text-xs font-bold px-2 py-0.5 rounded bg-green-50 text-green-600 border border-green-100"
+                        matTooltip="Aprobados">{{ row.documentSummary.approved }} ✓</span>
+                }
+                @if (row.documentSummary.rejected > 0) {
+                  <span class="text-xs font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100"
+                        matTooltip="Rechazados">{{ row.documentSummary.rejected }} ✗</span>
+                }
+                @if (row.documentSummary.pending > 0) {
+                  <span class="text-xs font-bold px-2 py-0.5 rounded bg-gray-50 text-gray-500 border border-gray-200"
+                        matTooltip="Sin archivo">{{ row.documentSummary.pending }} –</span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Deadline Column -->
+          <ng-container matColumnDef="deadline">
+            <th mat-header-cell *matHeaderCellDef class="table-header">Límite</th>
+            <td mat-cell *matCellDef="let row">
+              @if (row.documentsDeadline) {
+                <span class="text-xs font-bold text-gray-600">
+                  {{ row.documentsDeadline | date:'dd/MM/yyyy' }}
+                </span>
+              } @else {
+                <span class="text-gray-400 text-xs font-bold">—</span>
+              }
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="table-header text-right px-6">Acciones</th>
+            <td mat-cell *matCellDef="let row" class="text-right px-6">
+              <button mat-icon-button class="action-button"
+                      (click)="$event.stopPropagation(); navigateToDetail(row.professionalId)"
+                      matTooltip="Ver documentos">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              class="hover:bg-gray-50 transition-colors border-b border-gray-100 cursor-pointer"
+              (click)="navigateToDetail(row.professionalId)">
+          </tr>
+
+          <!-- No data row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell text-center py-12 text-gray-400" [attr.colspan]="displayedColumns.length">
+              <mat-icon class="!text-4xl mb-3 block mx-auto text-gray-300">inbox</mat-icon>
+              <span class="font-medium text-sm">No se encontraron profesionales con los filtros seleccionados</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="bg-white border-t border-gray-100 p-2">
+        <mat-paginator
+          [length]="totalItems()"
+          [pageSize]="pageSize()"
+          [pageIndex]="pageIndex()"
+          [pageSizeOptions]="[10, 20, 50]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons
+          class="!bg-transparent text-gray-500 font-medium text-xs">
+        </mat-paginator>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,216 @@
+<div class="p-6 space-y-6">
+
+  <!-- Top bar -->
+  <div class="flex justify-between items-center">
+    <button mat-stroked-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Volver al listado
+    </button>
+
+    @if (!loading() && professional() && getPendingDocsCount() > 0) {
+      <div class="flex gap-2">
+        <button mat-flat-button color="primary"
+                [disabled]="batchActionLoading()"
+                (click)="approveAll()">
+          @if (batchActionLoading()) {
+            <mat-spinner diameter="18" class="inline-block mr-1"></mat-spinner>
+          } @else {
+            <mat-icon>done_all</mat-icon>
+          }
+          Aprobar todo
+        </button>
+        <button mat-stroked-button color="warn"
+                [disabled]="batchActionLoading()"
+                (click)="rejectAll()">
+          <mat-icon>cancel</mat-icon>
+          Rechazar todo
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="flex justify-center py-16">
+      <mat-spinner diameter="56"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && professional()) {
+    <!-- Header card -->
+    <mat-card>
+      <mat-card-content class="!p-6">
+        <div class="flex flex-wrap items-start gap-6">
+          <!-- Avatar -->
+          @if (professional()!.avatarUrl) {
+            <img [src]="professional()!.avatarUrl" alt="avatar"
+                 class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                 (click)="openImage(professional()!.avatarUrl)" />
+          } @else {
+            <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+              <mat-icon class="!text-4xl text-gray-400">person</mat-icon>
+            </div>
+          }
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-3 mb-2">
+              <h2 class="text-xl font-bold text-gray-800">
+                {{ professional()!.userName }} {{ professional()!.userLastName }}
+              </h2>
+              <span class="text-xs font-medium px-2 py-1 rounded-full"
+                    [ngClass]="getProfessionalStatusClass(professional()!.professionalStatus)">
+                {{ getProfessionalStatusLabel(professional()!.professionalStatus) }}
+              </span>
+              @if (professional()!.isVerified) {
+                <span class="flex items-center gap-1 text-green-600 text-sm font-medium">
+                  <mat-icon class="!text-base">verified</mat-icon> Verificado
+                </span>
+              }
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600">
+              <div class="flex items-center gap-2">
+                <mat-icon class="!text-base text-gray-400">email</mat-icon>
+                {{ professional()!.userEmail }}
+              </div>
+              <div class="flex items-center gap-2">
+                <mat-icon class="!text-base text-gray-400">phone</mat-icon>
+                {{ professional()!.userPhone }}
+              </div>
+              <div class="flex items-center gap-2">
+                <mat-icon class="!text-base text-gray-400">calendar_today</mat-icon>
+                Registrado: {{ professional()!.createdAt | date:'dd/MM/yyyy' }}
+              </div>
+              @if (professional()!.documentsDeadline) {
+                <div class="flex items-center gap-2">
+                  <mat-icon class="!text-base text-orange-400">schedule</mat-icon>
+                  Fecha límite: {{ professional()!.documentsDeadline | date:'dd/MM/yyyy' }}
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- ID -->
+          <div class="text-right text-sm text-gray-400">
+            <p>ID Profesional: <span class="font-medium text-gray-600">#{{ professional()!.professionalId }}</span></p>
+            <p>ID Usuario: <span class="font-medium text-gray-600">#{{ professional()!.userId }}</span></p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Documents grid -->
+    <div>
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">
+        Documentos ({{ professional()!.documents.length }})
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @for (doc of professional()!.documents; track doc.id) {
+          <mat-card [ngClass]="{
+            'border-l-4 border-blue-400': doc.status === 'uploaded',
+            'border-l-4 border-green-400': doc.status === 'approved',
+            'border-l-4 border-red-400': doc.status === 'rejected',
+            'border-l-4 border-gray-300': doc.status === 'pending'
+          }">
+            <mat-card-content class="!p-4 space-y-4">
+              <!-- Doc header -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <mat-icon class="text-gray-500">badge</mat-icon>
+                  <span class="font-semibold text-gray-800">{{ doc.documentTypeLabel }}</span>
+                </div>
+                <span class="text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1"
+                      [ngClass]="getDocStatusClass(doc.status)">
+                  <mat-icon class="!text-sm">{{ getDocStatusIcon(doc.status) }}</mat-icon>
+                  {{ getDocStatusLabel(doc.status) }}
+                </span>
+              </div>
+
+              <!-- Image preview -->
+              @if (doc.fileUrl) {
+                <div class="rounded-lg overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer relative group"
+                     (click)="openImage(doc.fileUrl)">
+                  <img [src]="doc.fileUrl" [alt]="doc.documentTypeLabel"
+                       class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                       (error)="$any($event.target).style.display='none'" />
+                  <!-- Overlay de zoom -->
+                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <mat-icon class="text-white !text-4xl">zoom_in</mat-icon>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-400 truncate">{{ doc.fileName }}</p>
+              } @else {
+                <div class="rounded-lg bg-gray-50 border border-dashed border-gray-300 flex flex-col items-center justify-center py-8 gap-2">
+                  <mat-icon class="text-gray-300 !text-4xl">image_not_supported</mat-icon>
+                  <p class="text-gray-400 text-sm">Sin archivo subido</p>
+                </div>
+              }
+
+              <!-- Rejection reason -->
+              @if (doc.status === 'rejected' && doc.rejectionReason) {
+                <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <mat-icon class="text-red-500 !text-base">warning</mat-icon>
+                    <span class="text-sm font-medium text-red-700">Motivo del rechazo:</span>
+                  </div>
+                  <p class="text-sm text-red-600">{{ doc.rejectionReason }}</p>
+                </div>
+              }
+
+              <!-- Review info -->
+              @if (doc.reviewedAt) {
+                <p class="text-xs text-gray-400">
+                  Revisado el {{ doc.reviewedAt | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              }
+
+              <!-- Action buttons (only for uploaded docs) -->
+              @if (doc.status === 'uploaded') {
+                <div class="flex gap-2 pt-1">
+                  <button mat-flat-button color="primary"
+                          class="flex-1"
+                          [disabled]="actionLoading() === doc.id"
+                          (click)="approveDocument(doc)">
+                    @if (actionLoading() === doc.id) {
+                      <mat-spinner diameter="18" class="inline-block mr-1"></mat-spinner>
+                    } @else {
+                      <mat-icon>check_circle</mat-icon>
+                    }
+                    Aprobar
+                  </button>
+                  <button mat-stroked-button color="warn"
+                          class="flex-1"
+                          [disabled]="actionLoading() === doc.id"
+                          (click)="rejectDocument(doc)">
+                    <mat-icon>cancel</mat-icon>
+                    Rechazar
+                  </button>
+                </div>
+              }
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Image Overlay Viewer -->
+  @if (selectedImage()) {
+    <div class="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm cursor-pointer"
+         (click)="closeImage()">
+      <!-- Close button -->
+      <button mat-icon-button class="absolute top-4 right-4 !text-white bg-black/50 hover:bg-black/80 transition-colors"
+              (click)="closeImage(); $event.stopPropagation()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <!-- Image -->
+      <img [src]="selectedImage()"
+           class="max-w-full max-h-full object-contain cursor-default"
+           (click)="$event.stopPropagation()"
+           alt="Vista ampliada" />
+    </div>
+  }
+</div>

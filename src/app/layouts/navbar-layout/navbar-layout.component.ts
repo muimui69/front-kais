@@ -11,7 +11,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { LocalStorageService } from '../../shared/services/localstorage/localstorage.service';
 import { MaterialModule } from '../../shared/material.module';
-import { menuItem } from '../../shared/menuItem/menuItem';
+import { menuItem, MenuItem } from '../../shared/menuItem/menuItem';
 import { Menu } from '../../shared/enums/menu-enum/menu-Enum';
 import { AuthService } from '../../features/auth/services/auth.service';
 import { UserAvatarMenuComponent } from "../../shared/components/user-avatar-menu/user-avatar-menu.component";
@@ -34,7 +34,7 @@ export class NavbarLayoutComponent {
   showFiller = false;
   mobileQuery: MediaQueryList;
   readonly panelOpenState = signal(false);
-  public fillerNav = menuItem;
+  public filteredNav: MenuItem[] = [];
   private _mobileQueryListener: () => void;
   // public user?: LoginResponse;
   private local = inject(LocalStorageService);
@@ -53,6 +53,23 @@ export class NavbarLayoutComponent {
       // this.setUser()
       // console.log({ user: this.user })
     }
+    this.buildFilteredMenu();
+  }
+
+  private buildFilteredMenu(): void {
+    this.filteredNav = menuItem
+      .map(nav => {
+        if (!nav.items || nav.items.length === 0) {
+          if (!nav.permissions?.length) return nav;
+          return this.authService.hasAnyPermission(nav.permissions) ? nav : null;
+        }
+        const visibleItems = nav.items.filter(item =>
+          !item.permissions?.length || this.authService.hasAnyPermission(item.permissions)
+        );
+        if (visibleItems.length === 0) return null;
+        return { ...nav, items: visibleItems };
+      })
+      .filter((nav): nav is MenuItem => nav !== null);
   }
 
   // setIsDarkTheme() {

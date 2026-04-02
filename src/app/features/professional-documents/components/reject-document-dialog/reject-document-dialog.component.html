@@ -1,0 +1,29 @@
+<h2 mat-dialog-title class="flex items-center gap-2">
+  <mat-icon class="text-red-500">cancel</mat-icon>
+  Rechazar documento
+</h2>
+
+<mat-dialog-content class="!pt-2">
+  <p class="text-gray-600 mb-4">
+    Estás rechazando: <strong>{{ data.documentTypeLabel }}</strong>
+  </p>
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Motivo del rechazo</mat-label>
+    <textarea
+      matInput
+      [formControl]="reasonControl"
+      rows="3"
+      placeholder="Ej: La foto está borrosa, por favor suba una imagen más clara."
+    ></textarea>
+    <mat-error *ngIf="reasonControl.hasError('required')">El motivo es requerido</mat-error>
+    <mat-error *ngIf="reasonControl.hasError('minlength')">Mínimo 5 caracteres</mat-error>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="gap-2">
+  <button mat-stroked-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="warn" (click)="confirm()">
+    <mat-icon>block</mat-icon>
+    Confirmar rechazo
+  </button>
+</mat-dialog-actions>

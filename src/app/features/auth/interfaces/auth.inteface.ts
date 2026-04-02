@@ -35,8 +35,20 @@ export interface LoginData {
 
 export interface AdminContext {
     id: number;
+    name: string;
+    lastName: string;
+    email: string;
+    username: string;
+    phone: string | null;
     isActive: boolean;
-    user: User;
+    isVerified?: boolean;
+    status?: string;
+    lastLogin?: string | null;
+    photoUrl: string | null;
+    photoMediumUrl?: string | null;
+    photoThumbnailUrl?: string | null;
+    role: Role | null;
+    fullName?: string;
 }
 
 
@@ -50,6 +62,7 @@ export interface User {
     photoUrl: string | null;
     role: Role;
     fullName: string;
+    permissions: Permission[];
 }
 
 export interface Role {

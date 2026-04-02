@@ -1,24 +1,43 @@
 
-
 import { Menu } from "../enums/menu-enum/menu-Enum";
 
-export const menuItem = [
+export interface SubMenuItem {
+  name: string;
+  icon: string;
+  router: string;
+  permissions?: string[];
+}
+
+export interface MenuItem {
+  name: Menu;
+  icon: string;
+  router: string;
+  permissions?: string[];
+  items: SubMenuItem[];
+}
+
+export const menuItem: MenuItem[] = [
   {
     name: Menu.DASHBOARD,
     icon: 'dashboard',
     router: '/dashboard',
     items: []
   },
-  /*{
+  {
     name: Menu.GESTION_USUARIOS,
-    icon: 'group',
-    router: 'users',
+    icon: 'manage_accounts',
+    router: '',
     items: [
       {
-        name: 'Usuarios del sistema',
-        icon: 'person',
-        router: '/users/user-manegement',
-        // role: [Role.ADMIN]
+        name: 'Administradores',
+        icon: 'admin_panel_settings',
+        router: '/administrators',
+      },
+      {
+        name: 'Roles',
+        icon: 'badge',
+        router: '/roles',
+       // permissions: ['usuarios_rol_listar'],
       },
     ]
   },
@@ -28,17 +47,13 @@ export const menuItem = [
     router: '',
     items: [
       {
-        name: 'Pendientes',
-        icon: 'hourglass_empty',
-        router: '/verificacion-profesionales/pendientes',
-      },
-      {
-        name: 'Verificados',
-        icon: 'verified',
-        router: '/verificacion-profesionales/verificados',
+        name: 'Documentos de Profesionales',
+        icon: 'badge',
+        router: '/professional-documents',
+        //permissions: ['documentos_profesional_ver', 'documentos_profesional_verificar'],
       },
     ]
-  },*/
+  },
   {
     name: Menu.REPORTES_ESTADISTICAS,
     icon: 'bar_chart',
@@ -151,6 +166,7 @@ export const menuItem = [
         icon: 'local_offer',
         router: '/coupons',
       },
+
       /*{
         name: 'Créditos',
         icon: 'account_balance_wallet',
@@ -178,6 +194,31 @@ export const menuItem = [
       //   icon: 'send',
       //   router: '/notifications/immediate',
       // }
+    ]
+  },
+  {
+    name: Menu.PLANES_PROFESIONALES,
+    icon: 'card_membership',
+    router: '',
+    items: [
+      {
+        name: 'Planes',
+        icon: 'view_list',
+        router: '/planes',
+        permissions: ['planes_plan_listar'],
+      },
+      {
+        name: 'Catálogo de Features',
+        icon: 'featured_play_list',
+        router: '/planes/features',
+        permissions: ['planes_feature_listar'],
+      },
+      {
+        name: 'Suscripciones',
+        icon: 'subscriptions',
+        router: '/planes/subscriptions',
+        permissions: ['planes_suscripcion_listar'],
+      },
     ]
   },
 
